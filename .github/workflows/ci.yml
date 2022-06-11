@@ -28,5 +28,7 @@ jobs:
         run: dotnet format --no-restore --verify-no-changes --severity info
       - name: Build
         run: dotnet build --no-restore
-      - name: Run tests
-        run: dotnet test --no-build --verbosity normal
+      - name: Run unit tests
+        run: dotnet test --no-build --verbosity normal Reddio.UnitTests/Reddio.UnitTests.csproj
+      - name: Run integration tests
+        run: dotnet test --no-build --verbosity normal Reddio.IntegrationTests/Reddio.IntegrationTests.csproj
