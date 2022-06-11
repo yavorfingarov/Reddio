@@ -1,0 +1,9 @@
+﻿@page
+@model ErrorModel
+
+<h1>@Model.Response.StatusCode</h1>
+<p>@Model.ErrorMessage</p>
+<p>
+    Request ID: <code>@Model.HttpContext.TraceIdentifier</code>
+</p>
+

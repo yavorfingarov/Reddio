@@ -1,0 +1,34 @@
+﻿@page
+@using System.Globalization
+@model AboutModel
+
+<h1>About</h1>
+<p>
+    Reddio lets you listen to an exquisite music selection from Reddit's most cultured communities.
+</p>
+<p>
+    By frequently fetching the hottest tracks from a curated list of subreddits and keeping 
+    a local playback history in your browser, the application makes sure you are always discovering great music.
+</p>
+<p>
+    If you spot any problems and/or have improvement ideas, it would be great to share them 
+    via the <a href="https://github.com/yavorfingarov/Reddio/issues">issue tracker</a> or 
+    via email to <span class="r">moc tod kooltuo ta voragnif tod rovay</span>.
+</p>
+<h2>Metadata</h2>
+<table>
+    <tr>
+        <th>Tracks</th>
+        <th class="number">@Model.Stations.Sum(s => s.TrackCount).ToString("#,#", CultureInfo.InvariantCulture)</th>
+    </tr>
+    @foreach (var station in Model.Stations)
+    {
+        <tr>
+            <td>@station.Name</td>
+            <td class="number">@station.TrackCount.ToString("#,#", CultureInfo.InvariantCulture)</td>
+        </tr>
+    }
+</table>
+<p>
+    Last update: @Model.LastUpdate.ToString("yyyy-MM-dd HH:mm:ss UTC", CultureInfo.InvariantCulture)
+</p>

@@ -1,0 +1,41 @@
+name: CD
+
+on:
+  push:
+    branches: [ master ]
+    paths: 
+      - 'Reddio/**'
+
+env:
+  DOTNET_VERSION: 6.0.x
+  CSPROJ_PATH: Reddio/Reddio.csproj
+  AZURE_WEBAPP_NAME: Reddio
+  AZURE_WEBAPP_PACKAGE_PATH: './app'
+
+jobs:
+  build:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: ${{ steps.deploy-to-azure.outputs.webapp-url }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.CSPROJ_PATH }}
+      - name: Build
+        run: dotnet build --no-restore --configuration Release ${{ env.CSPROJ_PATH }}
+      - name: Create package
+        run: dotnet publish --no-build --configuration Release --output ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} ${{ env.CSPROJ_PATH }}
+      - name: Deploy to Azure
+        id: deploy-to-azure
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
