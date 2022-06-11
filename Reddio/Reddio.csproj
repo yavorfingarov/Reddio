@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Migrations\001_CreateSchema.sql" />
+    <None Remove="Migrations\002_AddStations.sql" />
+    <None Remove="Migrations\003_AddKnownDomains.sql" />
+    <None Remove="Migrations\004_InitializeMetadata.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\001_CreateSchema.sql" />
+    <EmbeddedResource Include="Migrations\002_AddStations.sql" />
+    <EmbeddedResource Include="Migrations\003_AddKnownDomains.sql" />
+    <EmbeddedResource Include="Migrations\004_InitializeMetadata.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="dbup-sqlite" Version="4.6.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.5" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.0.0" />
+    <PackageReference Include="SimpleRequestLogger" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.Data" />
+    <Using Include="Dapper" />
+    <Using Include="Microsoft.AspNetCore.Mvc.RazorPages" />
+  </ItemGroup>
+
+</Project>

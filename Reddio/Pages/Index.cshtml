@@ -1,0 +1,12 @@
+﻿@page
+@model IndexModel
+
+<h1>Stations</h1>
+<ul>
+    @foreach (var station in Model.Stations)
+    {
+        <li>
+            <a asp-page="/Listen" asp-route-station="@station">@station</a>
+        </li>
+    }
+</ul>

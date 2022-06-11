@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ master ]
+
+env:
+  DOTNET_VERSION: 6.0.x
+  REDDIT__CLIENTID: ${{ secrets.REDDIT__CLIENTID }}
+  REDDIT__CLIENTSECRET: ${{ secrets.REDDIT__CLIENTSECRET }}
+  REDDIT__PASSWORD: ${{ secrets.REDDIT__PASSWORD }}
+  REDDIT__USERNAME: ${{ secrets.REDDIT__USERNAME }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Analyze code
+        run: dotnet format --no-restore --verify-no-changes --severity info
+      - name: Build
+        run: dotnet build --no-restore
+      - name: Run tests
+        run: dotnet test --no-build --verbosity normal

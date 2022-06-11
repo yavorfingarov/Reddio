@@ -1,0 +1,19 @@
+{
+    "name": "reddio",
+    "start_url": "/",
+    "background_color": "#fdfdfd",
+    "theme_color": "#333",
+    "display": "standalone",
+    "icons": [
+        {
+            "src": "/icon32.png",
+            "type": "image/png",
+            "sizes": "32x32"
+        },
+        {
+            "src": "/icon192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        }
+    ]
+}

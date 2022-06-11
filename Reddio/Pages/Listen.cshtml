@@ -1,0 +1,36 @@
+﻿@page "{station}"
+@model ListenModel
+@{
+    ViewData["Station"] = Model.Station;
+}
+
+<noscript>
+    You need to enable JavaScript to listen to music.
+</noscript>
+<div id="cookie-dialog">
+    <p>
+        To listen to music, you need to consent to the usage of third-party cookies by the external streaming providers. 
+        More detailed information can be found in the <a asp-page="/Privacy">privacy section</a>.
+    </p>
+    <button id="accept-cookies">Accept cookies</button>
+</div>
+<div id="player-container">
+    <div id="track-title"></div>
+    <div id="player"></div>
+    <div>
+        <a id="view-thread">View thread</a>
+    </div>
+    <div>
+        <button id="load-next-track">Next track >></button>
+    </div>
+    <div>
+        <a asp-page="/History">History</a>
+    </div>
+</div>
+<script>
+    const station = "@Model.Station";
+</script>
+<script src='https://unpkg.com/react-player/dist/ReactPlayer.standalone.js'></script>
+<script src="~/shared.js"></script>
+<script src="~/cookie-policy.js"></script>
+<script src="~/player.js"></script>
