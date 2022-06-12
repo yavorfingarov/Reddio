@@ -22,7 +22,7 @@
                 var dataImportHandler = scope.ServiceProvider.GetRequiredService<IDataImportHandler>();
                 await ImportDataAsync(dataImportHandler);
             };
-            _Timer = new Timer(importData, null, TimeSpan.FromHours(1), TimeSpan.FromHours(1));
+            _Timer = new Timer(importData, null, TimeSpan.Zero, TimeSpan.FromHours(1));
 
             return Task.CompletedTask;
         }

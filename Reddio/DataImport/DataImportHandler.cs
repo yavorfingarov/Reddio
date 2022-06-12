@@ -11,14 +11,18 @@
 
         private readonly IRedditService _RedditService;
 
+        private readonly DataImportWatcher _DataImportWatcher;
+
         private readonly IConfiguration _Configuration;
 
         private readonly ILogger<DataImportHandler> _Logger;
 
-        public DataImportHandler(IDbConnection db, IRedditService redditService, IConfiguration configuration, ILogger<DataImportHandler> logger)
+        public DataImportHandler(IDbConnection db, IRedditService redditService, DataImportWatcher dataImportWatcher,
+            IConfiguration configuration, ILogger<DataImportHandler> logger)
         {
             _Db = db;
             _RedditService = redditService;
+            _DataImportWatcher = dataImportWatcher;
             _Configuration = configuration;
             _Logger = logger;
         }
@@ -36,6 +40,7 @@
                 "FROM Station s " +
                 "LEFT JOIN Track t ON s.Id = t.StationId " +
                 "GROUP BY s.Id");
+            _DataImportWatcher.IsPerformingFreshImport = stations.Sum(s => s.TrackCount) == 0;
             var tracks = new List<Track>();
             foreach (var station in stations)
             {
@@ -52,6 +57,7 @@
                 }
             }
             ImportTracks(tracks);
+            _DataImportWatcher.IsPerformingFreshImport = false;
         }
 
         private void ImportTracks(IEnumerable<Track> tracks)

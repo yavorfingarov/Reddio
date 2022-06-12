@@ -9,11 +9,15 @@ namespace Reddio.UnitTests.DataImport
 
         private readonly Mock<IRedditService> _RedditServiceMock;
 
+        private readonly DataImportWatcher _DataImportWatcher;
+
         public DataImportHandlerTests()
         {
             ConfigurationMock.Setup(c => c["DataImportPeriod"]).Returns("6");
             _RedditServiceMock = new Mock<IRedditService>(MockBehavior.Strict);
-            _DataImportHandler = new DataImportHandler(Db, _RedditServiceMock.Object, ConfigurationMock.Object, LoggerMock.Object);
+            _DataImportWatcher = new DataImportWatcher();
+            _DataImportHandler = new DataImportHandler(Db, _RedditServiceMock.Object, _DataImportWatcher,
+                ConfigurationMock.Object, LoggerMock.Object);
         }
 
         [Fact]
@@ -78,6 +82,7 @@ namespace Reddio.UnitTests.DataImport
                 Db.QuerySingle<string>("SELECT Title FROM Track WHERE ThreadId = 'thread5'"));
             Assert.Equal("https://known.domain/thread4",
                 Db.QuerySingle<string>("SELECT Url FROM Track WHERE ThreadId = 'thread4'"));
+            Assert.False(_DataImportWatcher.IsPerformingFreshImport);
             LoggerMock.Verify(LogLevel.Debug, "Importing data...");
             LoggerMock.Verify(LogLevel.Debug, "Data import finished. Rows affected: 7");
         }

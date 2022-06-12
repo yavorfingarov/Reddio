@@ -14,28 +14,36 @@ namespace Reddio.UnitTests.Api
         }
 
         [Fact]
-        public async Task Invoke_DoesNothing_WhenNextDoesNotThrow()
+        public async Task InvokeAsync_DoesNothing_WhenNextDoesNotThrow()
         {
-            RequestDelegate next = (context) => Task.CompletedTask;
+            var isNextInvoked = false;
+            RequestDelegate next = (context) =>
+            {
+                isNextInvoked = true;
+
+                return Task.CompletedTask;
+            };
             var exceptionHandler = new ExceptionHandler(next, LoggerMock.Object);
 
-            await exceptionHandler.Invoke(_HttpContextMock.Object);
+            await exceptionHandler.InvokeAsync(_HttpContextMock.Object);
+
+            Assert.True(isNextInvoked);
         }
 
         [Fact]
-        public async Task Invoke_ChangesStatusCodeTo400_WhenBadRequestExceptionIsThrown()
+        public async Task InvokeAsync_ChangesStatusCodeTo400_WhenBadRequestExceptionIsThrown()
         {
             _HttpContextMock.SetupProperty(c => c.Response.StatusCode, 200);
             RequestDelegate next = (context) => throw new BadHttpRequestException("test");
             var exceptionHandler = new ExceptionHandler(next, LoggerMock.Object);
 
-            await exceptionHandler.Invoke(_HttpContextMock.Object);
+            await exceptionHandler.InvokeAsync(_HttpContextMock.Object);
 
             Assert.Equal(400, _HttpContextMock.Object.Response.StatusCode);
         }
 
         [Fact]
-        public async Task Invoke_ChangesStatusCodeTo500_WhenExceptionIsThrown()
+        public async Task InvokeAsync_ChangesStatusCodeTo500_WhenExceptionIsThrown()
         {
             LoggerMock.Setup(LogLevel.Error);
             _HttpContextMock.SetupProperty(c => c.Response.StatusCode, 200);
@@ -43,7 +51,7 @@ namespace Reddio.UnitTests.Api
             RequestDelegate next = (context) => throw exception;
             var exceptionHandler = new ExceptionHandler(next, LoggerMock.Object);
 
-            await exceptionHandler.Invoke(_HttpContextMock.Object);
+            await exceptionHandler.InvokeAsync(_HttpContextMock.Object);
 
             Assert.Equal(500, _HttpContextMock.Object.Response.StatusCode);
             LoggerMock.Verify(LogLevel.Error, "An unhandled exception has occurred", exception);

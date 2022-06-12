@@ -196,7 +196,7 @@ namespace Reddio.UnitTests.DataImport
         }
 
         [Fact]
-        public async Task GetListingAsync_ReturnsListingAndWaits_WhenRateLimitReached()
+        public async Task GetListingAsync_ReturnsListingAndWaits_WhenRateLimitIsReached()
         {
             var tokenResponse = new HttpResponseMessage(HttpStatusCode.OK)
             {
