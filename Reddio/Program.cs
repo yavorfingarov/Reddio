@@ -23,7 +23,6 @@ namespace Reddio
                 var app = builder.Build();
                 logger.Debug($"Environment: {app.Environment.EnvironmentName}");
                 MigrateDb(app);
-                ImportData(app);
                 Configure(app);
                 app.Run();
             }
@@ -47,6 +46,8 @@ namespace Reddio
             builder.Services.AddScoped<IDbConnection>(sp => new SqliteConnection(builder.Configuration.GetConnectionString("Default")));
 
             builder.Services.AddScoped<IDataImportHandler, DataImportHandler>();
+
+            builder.Services.AddSingleton<DataImportWatcher>();
 
             builder.Services.AddHostedService<DataImportHostedService>();
 
@@ -85,6 +86,8 @@ namespace Reddio
             {
                 branch.UseMiddleware<ExceptionHandler>();
 
+                branch.UseMiddleware<DataImportWatcher>();
+
                 branch.UseRouting();
 
                 branch.UseEndpoints(endpoints =>
@@ -98,6 +101,8 @@ namespace Reddio
             app.UseStaticFiles();
 
             app.UseStatusCodePagesWithReExecute("/Error");
+
+            app.UseMiddleware<DataImportWatcher>();
 
             app.MapRazorPages();
         }
@@ -117,13 +122,6 @@ namespace Reddio
             {
                 throw result.Error;
             }
-        }
-
-        private static void ImportData(WebApplication app)
-        {
-            using var scope = app.Services.CreateScope();
-            var dataImportHandler = scope.ServiceProvider.GetRequiredService<IDataImportHandler>();
-            dataImportHandler.HandleAsync().Wait();
         }
     }
 }

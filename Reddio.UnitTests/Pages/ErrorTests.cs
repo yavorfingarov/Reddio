@@ -16,7 +16,8 @@ namespace Reddio.UnitTests.Pages
         [InlineData(404, "Not Found")]
         [InlineData(418, "Unexpected Error")]
         [InlineData(500, "Internal Server Error")]
-        public void OnGet_PopulatesErrorMessage(int statusCode, string expectedErrorMessage)
+        [InlineData(503, "Service Unavailable")]
+        public void OnGet_PopulatesModel(int statusCode, string expectedErrorMessage)
         {
             var errorModel = CreateModel(statusCode);
 
