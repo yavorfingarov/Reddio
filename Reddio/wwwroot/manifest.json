@@ -2,7 +2,7 @@
     "name": "reddio",
     "start_url": "/",
     "background_color": "#fdfdfd",
-    "theme_color": "#333",
+    "theme_color": "#a92e00",
     "display": "standalone",
     "icons": [
         {
