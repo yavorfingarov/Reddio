@@ -167,11 +167,11 @@ namespace Reddio.IntegrationTests
 
             Assert.Equal(new[] { "head", "body" }, htmlRoot.SelectNodes("/html/*").Select(n => n.Name));
 
-            Assert.Equal(new[] { "meta", "meta", "meta", "meta", "meta", "title", "link", "link", "link", "link" },
+            Assert.Equal(new[] { "meta", "meta", "meta", "meta", "meta", "meta", "title", "link", "link", "link", "link" },
                 htmlRoot.SelectNodes("/html/head/*").Select(n => n.Name));
 
             var metaNodes = htmlRoot.SelectNodes("/html/head/meta");
-            Assert.Equal(5, metaNodes.Count);
+            Assert.Equal(6, metaNodes.Count);
             Assert.Equal("utf-8", metaNodes[0].Attributes["charset"].Value);
             Assert.Equal("viewport", metaNodes[1].Attributes["name"].Value);
             Assert.Equal("width=device-width, initial-scale=1", metaNodes[1].Attributes["content"].Value);
@@ -182,6 +182,8 @@ namespace Reddio.IntegrationTests
             Assert.Equal("radio, reddit, music", metaNodes[3].Attributes["content"].Value);
             Assert.Equal("author", metaNodes[4].Attributes["name"].Value);
             Assert.Equal("Yavor Fingarov", metaNodes[4].Attributes["content"].Value);
+            Assert.Equal("theme-color", metaNodes[5].Attributes["name"].Value);
+            Assert.Equal("#a92e00", metaNodes[5].Attributes["content"].Value);
 
             Assert.Contains("reddio", htmlRoot.SelectSingleNode("/html/head/title").InnerText);
 
