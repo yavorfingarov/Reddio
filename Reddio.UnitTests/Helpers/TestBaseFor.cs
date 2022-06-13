@@ -32,12 +32,13 @@ namespace Reddio.UnitTests.Helpers
             }
             Db.Execute("DELETE FROM Station");
             Db.Execute("DELETE FROM KnownDomain");
+            Db.Execute("DELETE FROM sqlite_sequence");
         }
 
         public void Dispose()
         {
             GC.SuppressFinalize(this);
-            Db?.Dispose();
+            Db.Dispose();
         }
     }
 }

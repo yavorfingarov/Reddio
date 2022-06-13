@@ -14,9 +14,9 @@ INSERT INTO Station (Name, DisplayOrder) VALUES ('icm', 60);
 
 INSERT INTO Station (Name, DisplayOrder) VALUES ('AfricanMusic', 70);
 
-INSERT INTO Station (Name, DisplayOrder) VALUES ('WorldMusic', 80);
+INSERT INTO Station (Name, DisplayOrder) VALUES ('klezmer', 80);
 
-INSERT INTO Station (Name, DisplayOrder) VALUES ('klezmer', 90);
+INSERT INTO Station (Name, DisplayOrder) VALUES ('WorldMusic', 90);
 
 INSERT INTO Station (Name, DisplayOrder) VALUES ('minimalism_music', 100);
 

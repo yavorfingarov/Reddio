@@ -38,7 +38,7 @@
             var stations = _Db.Query<(int Id, string Name, int TrackCount)>(
                 "SELECT s.Id, s.Name, COUNT(t.Id) AS TrackCount " +
                 "FROM Station s " +
-                "LEFT JOIN Track t ON s.Id = t.StationId " +
+                "LEFT JOIN Track t ON t.StationId = s.Id " +
                 "GROUP BY s.Id");
             _DataImportWatcher.IsPerformingFreshImport = stations.Sum(s => s.TrackCount) == 0;
             var tracks = new List<Track>();
@@ -60,39 +60,6 @@
             _DataImportWatcher.IsPerformingFreshImport = false;
         }
 
-        private void ImportTracks(IEnumerable<Track> tracks)
-        {
-            _Db.Open();
-            using var transaction = _Db.BeginTransaction();
-            try
-            {
-                var affectedRows = 0;
-                var knownDomains = _Db.Query<string>("SELECT Domain FROM KnownDomain")
-                    .SelectMany(kd => new[] { $"https://{kd}", $"http://{kd}" })
-                    .ToList();
-                foreach (var track in tracks)
-                {
-                    if (knownDomains.Any(kd => track.Url.StartsWith(kd)))
-                    {
-                        affectedRows += _Db.Execute(
-                            "INSERT INTO Track (StationId, ThreadId, Title, Url) " +
-                            "VALUES (@StationId, @ThreadId, @Title, @Url)",
-                            track, transaction);
-                    }
-                }
-                _Db.Execute("UPDATE Metadata SET LastImport = @LastImport",
-                    new { LastImport = DateTime.UtcNow }, transaction);
-                transaction.Commit();
-                _Logger.LogDebug("Data import finished. Rows affected: {AffectedRows}", affectedRows);
-            }
-            catch (Exception)
-            {
-                transaction.Rollback();
-
-                throw;
-            }
-        }
-
         private async Task<IEnumerable<Track>> GetTracksAsync(string stationName,
             int stationId, int count, string sort, string? period = null)
         {
@@ -102,6 +69,62 @@
                 .Reverse();
 
             return tracks;
+        }
+
+        private void ImportTracks(IEnumerable<Track> tracks)
+        {
+            var knownDomains = _Db.Query<string>("SELECT Domain FROM KnownDomain")
+                .SelectMany(kd => new[] { $"https://{kd}", $"http://{kd}" })
+                .ToList();
+            _Db.Open();
+            using var transaction = _Db.BeginTransaction();
+            try
+            {
+                var affectedRows = InsertData(transaction, tracks, knownDomains);
+                ValidateImport(transaction);
+                _Db.Execute("UPDATE Metadata SET LastImport = @LastImport",
+                    new { LastImport = DateTime.UtcNow }, transaction);
+                transaction.Commit();
+                _Logger.LogDebug("Data import finished. {AffectedRows} rows affected.", affectedRows);
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+
+                throw;
+            }
+        }
+
+        private int InsertData(IDbTransaction transaction, IEnumerable<Track> tracks, List<string> knownDomains)
+        {
+            var affectedRows = 0;
+            foreach (var track in tracks)
+            {
+                if (knownDomains.Any(kd => track.Url.StartsWith(kd)))
+                {
+                    affectedRows += _Db.Execute(
+                        "INSERT INTO Track (StationId, ThreadId, Title, Url) " +
+                        "VALUES (@StationId, @ThreadId, @Title, @Url)",
+                        track, transaction);
+                }
+            }
+
+            return affectedRows;
+        }
+
+        private void ValidateImport(IDbTransaction transaction)
+        {
+            var emptyStationNames = _Db.Query<string>(
+                "SELECT s.Name " +
+                "FROM Station s " +
+                "LEFT JOIN Track t ON t.StationId = s.Id " +
+                "GROUP BY s.Id " +
+                "HAVING COUNT(t.Id) = 0",
+                transaction: transaction);
+            if (emptyStationNames.Any())
+            {
+                throw new InvalidOperationException($"No tracks found for {string.Join(", ", emptyStationNames)}.");
+            }
         }
     }
 
