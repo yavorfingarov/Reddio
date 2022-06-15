@@ -20,7 +20,7 @@ namespace Reddio.UnitTests.Api
         [Fact]
         public void Handle_Returns500_WhenLastImportIsOlder()
         {
-            Db.Execute("UPDATE Metadata SET LastImport = @LastImport", new { LastImport = DateTime.UtcNow.AddHours(-20) });
+            Db.Execute("UPDATE Metadata SET LastImport = @LastImport", new { LastImport = DateTime.UtcNow.AddHours(-14) });
 
             var result = HealthRequestHandler.Handle(Db, ConfigurationMock.Object);
 
@@ -30,7 +30,7 @@ namespace Reddio.UnitTests.Api
         [Fact]
         public void Handle_Returns200_WhenLastImportIsFresh()
         {
-            Db.Execute("UPDATE Metadata SET LastImport = @LastImport", new { LastImport = DateTime.UtcNow.AddHours(-1) });
+            Db.Execute("UPDATE Metadata SET LastImport = @LastImport", new { LastImport = DateTime.UtcNow.AddHours(-8) });
 
             var result = HealthRequestHandler.Handle(Db, ConfigurationMock.Object);
 

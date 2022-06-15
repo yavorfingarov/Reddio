@@ -5,7 +5,7 @@
         public static IResult Handle(IDbConnection db, IConfiguration configuration)
         {
             var lastImport = db.QuerySingle<DateTime>("SELECT LastImport FROM Metadata");
-            if (DateTime.UtcNow - lastImport > TimeSpan.FromHours(int.Parse(configuration["DataImportPeriod"]) + 1.5))
+            if (DateTime.UtcNow - lastImport > TimeSpan.FromHours((int.Parse(configuration["DataImportPeriod"]) * 2) + 1.5))
             {
                 return Results.StatusCode(500);
             }

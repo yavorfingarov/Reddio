@@ -39,8 +39,8 @@ namespace Reddio.IntegrationTests
             await Check("/r/Jazz", htmlRoot =>
             {
                 Assert.NotEmpty(htmlRoot.SelectNodes("//main/div"));
-                Assert.NotEmpty(htmlRoot.SelectNodes("//main/script"));
                 Assert.NotEmpty(htmlRoot.SelectNodes("//main//a"));
+                Assert.NotEmpty(htmlRoot.SelectNodes("//main/script"));
             });
         }
 
@@ -64,6 +64,7 @@ namespace Reddio.IntegrationTests
                 Assert.Equal("Metadata", htmlRoot.SelectSingleNode("//main/h2").InnerText);
                 Assert.NotEmpty(htmlRoot.SelectNodes("//main/table/tr/th"));
                 Assert.NotEmpty(htmlRoot.SelectNodes("//main/table/tr/td"));
+                Assert.NotEmpty(htmlRoot.SelectNodes("//main/script"));
             });
         }
 
@@ -111,6 +112,7 @@ namespace Reddio.IntegrationTests
         [InlineData("/cookie-policy.js")]
         [InlineData("/player.js")]
         [InlineData("/history.js")]
+        [InlineData("/about.js")]
         public async Task Get_StaticFile_ReturnsFile(string path)
         {
             var response = await _Fixture.Client.GetAsync(path);

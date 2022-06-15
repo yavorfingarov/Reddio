@@ -24,7 +24,9 @@
                 "SELECT t.ThreadId, t.Title, t.Url " +
                 "FROM Track t " +
                 "JOIN Station s ON s.Id = t.StationId " +
-                "WHERE {0} ORDER BY t.Id DESC LIMIT @QueueLength";
+                "WHERE {0} " +
+                "ORDER BY t.Id DESC " +
+                "LIMIT @QueueLength";
             var predicates = new List<string>() { "s.Name = @StationName" };
             var parameters = new Dictionary<string, object?>()
             {
