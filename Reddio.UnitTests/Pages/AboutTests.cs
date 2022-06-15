@@ -12,7 +12,8 @@ namespace Reddio.UnitTests.Pages
             AddStation(1, "TestStation1", 30, 45);
             AddStation(2, "TestStation2", 20, 5);
             AddStation(3, "TestStation3", 10, 20);
-            AddStation(4, "TestStation4", 40, 18);
+            AddStation(4, "TestStation5", 40, 0);
+            AddStation(5, "TestStation4", 50, 18);
             var aboutModel = new AboutModel(Db);
 
             aboutModel.OnGet();

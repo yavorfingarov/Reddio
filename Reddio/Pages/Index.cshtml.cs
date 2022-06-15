@@ -13,7 +13,11 @@ namespace Reddio.Pages
 
         public void OnGet()
         {
-            Stations = _Db.Query<string>("SELECT Name FROM Station ORDER BY DisplayOrder");
+            Stations = _Db.Query<string>(
+                "SELECT s.Name " +
+                "FROM Station s " +
+                "WHERE EXISTS (SELECT * FROM Track t WHERE t.StationId = s.Id) " +
+                "ORDER BY s.DisplayOrder");
         }
     }
 }
