@@ -12,7 +12,8 @@ namespace Reddio.UnitTests.DataImport
         public DataImportHostedServiceTests()
         {
             _DataImportHandlerMock = new Mock<IDataImportHandler>(MockBehavior.Strict);
-            _DataImportHostedService = new DataImportHostedService(LoggerMock.Object, Mock.Of<IServiceProvider>(MockBehavior.Strict));
+            _DataImportHostedService = new DataImportHostedService(LoggerMock.Object, 
+                ConfigurationMock.Object, Mock.Of<IServiceProvider>(MockBehavior.Strict));
         }
 
         [Fact]
