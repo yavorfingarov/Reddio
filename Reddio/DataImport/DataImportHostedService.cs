@@ -10,7 +10,7 @@
 
         private Timer? _Timer;
 
-        public DataImportHostedService(ILogger<DataImportHostedService> logger, IConfiguration configuration, 
+        public DataImportHostedService(ILogger<DataImportHostedService> logger, IConfiguration configuration,
             IServiceProvider serviceProvider)
         {
             _Logger = logger;
