@@ -6,7 +6,8 @@ namespace Reddio.UnitTests.Api
     {
         public HealthRequestHandlerTests()
         {
-            ConfigurationMock.Setup(c => c["DataImportPeriod"]).Returns("6");
+            ConfigurationMock.Setup(c => c["DataImport:Period"]).Returns("6");
+            ConfigurationMock.Setup(c => c["DataImport:HostedServicePeriod"]).Returns("1");
         }
 
         [Fact]
@@ -30,7 +31,7 @@ namespace Reddio.UnitTests.Api
         [Fact]
         public void Handle_Returns200_WhenLastImportIsFresh()
         {
-            Db.Execute("UPDATE Metadata SET LastImport = @LastImport", new { LastImport = DateTime.UtcNow.AddHours(-8) });
+            Db.Execute("UPDATE Metadata SET LastImport = @LastImport", new { LastImport = DateTime.UtcNow.AddHours(-13) });
 
             var result = HealthRequestHandler.Handle(Db, ConfigurationMock.Object);
 

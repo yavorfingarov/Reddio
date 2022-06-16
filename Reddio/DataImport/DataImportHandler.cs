@@ -30,7 +30,7 @@
         public async Task HandleAsync()
         {
             var lastUpdate = _Db.QuerySingle<DateTime>("SELECT LastImport FROM Metadata");
-            var dataImportPeriod = int.Parse(_Configuration["DataImportPeriod"]);
+            var dataImportPeriod = int.Parse(_Configuration["DataImport:Period"]);
             if (DateTime.UtcNow - lastUpdate < TimeSpan.FromHours(dataImportPeriod) - TimeSpan.FromMinutes(5))
             {
                 return;
