@@ -7,8 +7,7 @@ function acceptCookies(callback) {
 }
 
 function showCookieDialog(callback) {
-    let dialog = document.getElementById("cookie-dialog");
-    dialog.style.display = "initial";
+    document.getElementById("cookie-dialog").style.display = "initial";
     document.getElementById("accept-cookies")
         .addEventListener("click", () => acceptCookies(callback));
 }
