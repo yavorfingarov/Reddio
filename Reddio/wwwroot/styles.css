@@ -130,6 +130,7 @@ code {
     margin-left: 0.4em;
 }
 
+#main-container,
 #cookie-dialog,
 #player-container {
     display: none;
