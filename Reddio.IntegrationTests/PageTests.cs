@@ -194,7 +194,7 @@ namespace Reddio.IntegrationTests
             Assert.Equal(new[] { "https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css", "/styles.css", "/manifest.json", "/icon32.png" },
                 htmlRoot.SelectNodes("/html/head/link").Select(n => n.Attributes["href"].Value));
 
-            Assert.Equal(new[] { "header", "noscript", "main", "script", "footer" }, 
+            Assert.Equal(new[] { "header", "noscript", "main", "script", "footer" },
                 htmlRoot.SelectNodes("/html/body/*").Select(n => n.Name));
 
             Assert.Equal("reddio", htmlRoot.SelectSingleNode("/html/body/header/span").InnerText.Trim());
