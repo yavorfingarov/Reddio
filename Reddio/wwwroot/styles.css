@@ -85,6 +85,10 @@ li {
     margin-bottom: 0.75em;
 }
 
+table {
+    border-collapse: collapse;
+}
+
 th,
 td {
     padding-bottom: 0.25em;
