@@ -48,6 +48,7 @@ namespace Reddio.UnitTests.DataImport
         [InlineData(400)]
         [InlineData(404)]
         [InlineData(500)]
+        [InlineData(503)]
         public async Task InvokeAsync_DoesNothing_WhenIsPerformingFreshImportAndResponseStatusCodeIsNotOk(int statusCode)
         {
             _HttpContextMock.SetupProperty(c => c.Response.StatusCode, statusCode);
