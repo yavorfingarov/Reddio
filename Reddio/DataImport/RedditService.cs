@@ -109,6 +109,7 @@ namespace Reddio.DataImport
             return token;
         }
 
+        // TODO Remove this once the CI pipeline is stable
         private string GetConfigurationValue(string key)
         {
             var value = _Configuration[key];
