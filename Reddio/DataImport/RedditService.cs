@@ -93,10 +93,10 @@ namespace Reddio.DataImport
         private async Task<TokenResponse> GetTokenAsync()
         {
             var url = $"https://www.reddit.com/api/v1/access_token?grant_type=password" +
-                $"&username={_Configuration["Reddit:Username"]}&password={_Configuration["Reddit:Password"]}";
+                $"&username={GetConfigurationValue("Reddit:Username")}&password={GetConfigurationValue("Reddit:Password")}";
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             var basicToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(
-                $"{_Configuration["Reddit:ClientId"]}:{_Configuration["Reddit:ClientSecret"]}"));
+                $"{GetConfigurationValue("Reddit:ClientId")}:{GetConfigurationValue("Reddit:ClientSecret")}"));
             request.Headers.Add("authorization", $"basic {basicToken}");
             var response = await _HttpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
@@ -107,6 +107,18 @@ namespace Reddio.DataImport
             }
 
             return token;
+        }
+
+        // TODO Remove this once the CI pipeline is stable
+        private string GetConfigurationValue(string key)
+        {
+            var value = _Configuration[key];
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new InvalidOperationException($"{key} cannot be empty.");
+            }
+
+            return value;
         }
     }
 
