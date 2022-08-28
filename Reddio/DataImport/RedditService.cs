@@ -101,7 +101,7 @@ namespace Reddio.DataImport
             var response = await _HttpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
             var token = await response.Content.ReadFromJsonAsync<TokenResponse>(_JsonSerializerOptions);
-            if (token == null || string.IsNullOrWhiteSpace(token.TokenType) || 
+            if (token == null || string.IsNullOrWhiteSpace(token.TokenType) ||
                 string.IsNullOrWhiteSpace(token.AccessToken) || token.ExpiresIn <= 0)
             {
                 throw new InvalidOperationException("Failed to get authorization token.");
