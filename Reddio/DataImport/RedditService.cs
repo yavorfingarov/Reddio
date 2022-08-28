@@ -82,7 +82,7 @@ namespace Reddio.DataImport
                 await Task.Delay(((int)double.Parse(response.Headers.GetValues("x-ratelimit-reset").Single()) * 1000) + 2000);
             }
             var listingResponse = await response.Content.ReadFromJsonAsync<ListingResponse>(_JsonSerializerOptions);
-            if (listingResponse == null || !listingResponse.Data.Children.Any())
+            if (listingResponse?.Data?.Children == null || !listingResponse.Data.Children.Any())
             {
                 throw new InvalidOperationException("Failed to get listing response.");
             }
@@ -101,7 +101,8 @@ namespace Reddio.DataImport
             var response = await _HttpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
             var token = await response.Content.ReadFromJsonAsync<TokenResponse>(_JsonSerializerOptions);
-            if (token == null || string.IsNullOrWhiteSpace(token.TokenType) || string.IsNullOrWhiteSpace(token.AccessToken))
+            if (token == null || string.IsNullOrWhiteSpace(token.TokenType) || 
+                string.IsNullOrWhiteSpace(token.AccessToken) || token.ExpiresIn <= 0)
             {
                 throw new InvalidOperationException("Failed to get authorization token.");
             }
