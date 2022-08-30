@@ -37,7 +37,7 @@ jobs:
           targetdir: CoverageReport
           reporttypes: 'HtmlInline;Cobertura;MarkdownSummary'
       - name: Set up Stryker
-        run: dotnet install dotnet-stryker --tool-path ./tools
+        run: dotnet tool install dotnet-stryker --tool-path ./tools
       - name: Run mutation tests
         run: ./tools/dotnet-stryker -f stryker-config.yaml
       - name: Upload coverage report artifact
