@@ -30,19 +30,20 @@ jobs:
         run: dotnet build --no-restore
       - name: Run tests
         run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
-      - name: ReportGenerator
+      - name: Generate coverage report
         uses: danielpalme/ReportGenerator-GitHub-Action@5.1.9
         with:
-          reports: '**/coverage.cobertura.xml'
-          targetdir: coveragereport
-          reporttypes: 'Html;MarkdownSummary'
+          reports: '/coverage/*/coverage.cobertura.xml'
+          targetdir: CoverageReport
+          reporttypes: 'HtmlInline;Cobertura;MarkdownSummary'
+      - name: Set up Stryker
+        run: dotnet install dotnet-stryker --tool-path ./tools
+      - name: Run mutation tests
+        run: ./tools/dotnet-stryker -f stryker-config.yaml
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v2.2.3
         with:
           name: CoverageReport      
-          path: coveragereport
-      # - name: Add coverage comment
-      #   uses: marocchino/sticky-pull-request-comment@v2
-      #   with:
-      #     recreate: true
-      #     path: code-coverage-results.md
+          path: |
+            CoverageReport/
+            StrykerOutput/*/reports/
