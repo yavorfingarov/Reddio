@@ -82,7 +82,7 @@ namespace Reddio.DataImport
                 await Task.Delay(((int)double.Parse(response.Headers.GetValues("x-ratelimit-reset").Single()) * 1000) + 2000);
             }
             var listingResponse = await response.Content.ReadFromJsonAsync<ListingResponse>(_JsonSerializerOptions);
-            if (listingResponse == null || !listingResponse.Data.Children.Any())
+            if (listingResponse?.Data?.Children == null || !listingResponse.Data.Children.Any())
             {
                 throw new InvalidOperationException("Failed to get listing response.");
             }
@@ -93,32 +93,21 @@ namespace Reddio.DataImport
         private async Task<TokenResponse> GetTokenAsync()
         {
             var url = $"https://www.reddit.com/api/v1/access_token?grant_type=password" +
-                $"&username={GetConfigurationValue("Reddit:Username")}&password={GetConfigurationValue("Reddit:Password")}";
+                $"&username={_Configuration["Reddit:Username"]}&password={_Configuration["Reddit:Password"]}";
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             var basicToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(
-                $"{GetConfigurationValue("Reddit:ClientId")}:{GetConfigurationValue("Reddit:ClientSecret")}"));
+                $"{_Configuration["Reddit:ClientId"]}:{_Configuration["Reddit:ClientSecret"]}"));
             request.Headers.Add("authorization", $"basic {basicToken}");
             var response = await _HttpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
             var token = await response.Content.ReadFromJsonAsync<TokenResponse>(_JsonSerializerOptions);
-            if (token == null || string.IsNullOrWhiteSpace(token.TokenType) || string.IsNullOrWhiteSpace(token.AccessToken))
+            if (token == null || string.IsNullOrWhiteSpace(token.TokenType) ||
+                string.IsNullOrWhiteSpace(token.AccessToken) || token.ExpiresIn <= 0)
             {
                 throw new InvalidOperationException("Failed to get authorization token.");
             }
 
             return token;
-        }
-
-        // TODO Remove this once the CI pipeline is stable
-        private string GetConfigurationValue(string key)
-        {
-            var value = _Configuration[key];
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                throw new InvalidOperationException($"{key} cannot be empty.");
-            }
-
-            return value;
         }
     }
 
