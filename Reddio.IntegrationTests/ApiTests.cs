@@ -48,10 +48,11 @@ namespace Reddio.IntegrationTests
             var response = await _Fixture.Client.PostAsJsonAsync("/api/queue", new QueueRequest("Jazz", Enumerable.Empty<string>()));
             var tracks = await response.Content.ReadFromJsonAsync<IEnumerable<Track>>();
 
-            Assert.True(tracks?.Any());
-            Assert.True(tracks?.All(t => !string.IsNullOrWhiteSpace(t.ThreadId)));
-            Assert.True(tracks?.All(t => !string.IsNullOrWhiteSpace(t.Title)));
-            Assert.True(tracks?.All(t => !string.IsNullOrWhiteSpace(t.Url)));
+            Assert.NotNull(tracks);
+            Assert.NotEmpty(tracks);
+            Assert.True(tracks.All(t => !string.IsNullOrWhiteSpace(t.ThreadId)));
+            Assert.True(tracks.All(t => !string.IsNullOrWhiteSpace(t.Title)));
+            Assert.True(tracks.All(t => !string.IsNullOrWhiteSpace(t.Url)));
         }
 
         [Fact]
@@ -74,8 +75,9 @@ namespace Reddio.IntegrationTests
             var tracks2 = await response2.Content.ReadFromJsonAsync<IEnumerable<Track>>();
             var threadIds2 = tracks2?.Select(t => t.ThreadId);
 
-            Assert.True(threadIds2?.Any());
-            Assert.True(threadIds2?.ToHashSet().IsProperSupersetOf(threadIds1?.Skip(5)!));
+            Assert.NotNull(threadIds2);
+            Assert.NotEmpty(threadIds2);
+            Assert.True(threadIds2.ToHashSet().IsProperSupersetOf(threadIds1?.Skip(5)!));
             Assert.DoesNotContain(threadIds2, t => ignoreThreadIds!.Contains(t));
         }
 

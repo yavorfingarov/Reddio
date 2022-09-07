@@ -131,7 +131,7 @@ namespace Reddio.UnitTests.DataImport
                 Db.QuerySingle<string>("SELECT Url FROM Track WHERE ThreadId = 'thread4'"));
             Assert.False(_DataImportWatcher.IsPerformingFreshImport);
             LoggerMock.Verify(LogLevel.Debug, "Importing data...");
-            LoggerMock.Verify(LogLevel.Debug, "Data import finished. 7 rows affected.");
+            LoggerMock.Verify(LogLevel.Debug, "Data import finished. 7 row(s) affected.");
         }
     }
 }
