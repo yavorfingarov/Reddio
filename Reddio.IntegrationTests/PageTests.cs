@@ -28,6 +28,7 @@ namespace Reddio.IntegrationTests
                     var response = await _Fixture.Client.PostAsync("/api/queue", body);
                     response.EnsureSuccessStatusCode();
                     var tracks = await response.Content.ReadFromJsonAsync<IEnumerable<Track>>();
+                    Assert.NotNull(tracks);
                     Assert.NotEmpty(tracks);
                 }
             });

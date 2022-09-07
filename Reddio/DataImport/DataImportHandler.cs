@@ -86,7 +86,7 @@
                 _Db.Execute("UPDATE Metadata SET LastImport = @LastImport",
                     new { LastImport = DateTime.UtcNow }, transaction);
                 transaction.Commit();
-                _Logger.LogDebug("Data import finished. {AffectedRows} rows affected.", affectedRows);
+                _Logger.LogDebug("Data import finished. {AffectedRows} row(s) affected.", affectedRows);
             }
             catch (Exception)
             {

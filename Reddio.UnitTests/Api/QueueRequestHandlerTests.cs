@@ -37,8 +37,9 @@ namespace Reddio.UnitTests.Api
             var result = QueueRequestHandler.Handle(request, Db, ConfigurationMock.Object);
 
             Assert.Equal(200, result.GetStatusCode());
-            Assert.Equal(Enumerable.Range(1, 25).Select(i => $"TestThread{i}"),
-                result.GetValue<IEnumerable<Track>>()?.Select(t => t.ThreadId));
+            var threadIds = result.GetValue<IEnumerable<Track>>()?.Select(t => t.ThreadId);
+            Assert.NotNull(threadIds);
+            Assert.Equal(Enumerable.Range(1, 25).Select(i => $"TestThread{i}"), threadIds);
         }
 
         [Fact]
@@ -49,8 +50,9 @@ namespace Reddio.UnitTests.Api
             var result = QueueRequestHandler.Handle(request, Db, ConfigurationMock.Object);
 
             Assert.Equal(200, result.GetStatusCode());
-            Assert.Equal(Enumerable.Range(26, 25).Select(i => $"TestThread{i}"),
-                result.GetValue<IEnumerable<Track>>()?.Select(t => t.ThreadId));
+            var threadIds = result.GetValue<IEnumerable<Track>>()?.Select(t => t.ThreadId);
+            Assert.NotNull(threadIds);
+            Assert.Equal(Enumerable.Range(26, 25).Select(i => $"TestThread{i}"), threadIds);
         }
 
         [Fact]
@@ -61,8 +63,9 @@ namespace Reddio.UnitTests.Api
             var result = QueueRequestHandler.Handle(request, Db, ConfigurationMock.Object);
 
             Assert.Equal(200, result.GetStatusCode());
-            Assert.Equal(Enumerable.Range(1, 25).Select(i => $"TestThread{i}"),
-                result.GetValue<IEnumerable<Track>>()?.Select(t => t.ThreadId));
+            var threadIds = result.GetValue<IEnumerable<Track>>()?.Select(t => t.ThreadId);
+            Assert.NotNull(threadIds);
+            Assert.Equal(Enumerable.Range(1, 25).Select(i => $"TestThread{i}"), threadIds);
         }
     }
 }
