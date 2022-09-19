@@ -23,7 +23,7 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="dbup-sqlite" Version="4.6.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.8" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.9" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.1.4" />
     <PackageReference Include="SimpleRequestLogger" Version="2.0.2" />
   </ItemGroup>
