@@ -125,11 +125,6 @@ code {
     font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
 }
 
-.r {
-    unicode-bidi: bidi-override;
-    direction: rtl;
-}
-
 #station {
     margin-left: 0.4em;
 }
