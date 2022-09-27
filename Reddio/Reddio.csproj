@@ -4,14 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Migrations\001_CreateSchema.sql" />
-    <None Remove="Migrations\002_AddStations.sql" />
-    <None Remove="Migrations\003_AddKnownDomains.sql" />
-    <None Remove="Migrations\004_InitializeMetadata.sql" />
-  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Migrations\001_CreateSchema.sql" />
