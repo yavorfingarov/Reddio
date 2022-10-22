@@ -1,7 +1,9 @@
 ﻿namespace Reddio.Api
 {
-    public class QueueRequestHandler
+    [Endpoint]
+    public class QueueEndpoint
     {
+        [Post("/api/queue")]
         public static IResult Handle(QueueRequest request, IDbConnection db, IConfiguration configuration)
         {
             var queueLength = int.Parse(configuration["QueueLength"]);
