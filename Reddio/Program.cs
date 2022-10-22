@@ -22,8 +22,8 @@ namespace Reddio
                 ConfigureServices(builder);
                 var app = builder.Build();
                 logger.Debug($"Environment: {app.Environment.EnvironmentName}");
-                MigrateDb(app);
                 Configure(app);
+                MigrateDb(app);
                 app.Run();
             }
             catch (Exception ex)
@@ -90,12 +90,7 @@ namespace Reddio
 
                 branch.UseRouting();
 
-                branch.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapMethods("/api/health", new[] { "HEAD" }, HealthRequestHandler.Handle);
-
-                    endpoints.MapPost("/api/queue", QueueRequestHandler.Handle);
-                });
+                branch.UseEndpoints(endpoints => endpoints.MapEndpoints());
             });
 
             app.UseStaticFiles();

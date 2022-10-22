@@ -1,7 +1,9 @@
 ﻿namespace Reddio.Api
 {
-    public class HealthRequestHandler
+    [Endpoint]
+    public class HealthEndpoint
     {
+        [Map("HEAD", "/api/health")]
         public static IResult Handle(IDbConnection db, IConfiguration configuration)
         {
             var lastImport = db.QuerySingle<DateTime>("SELECT LastImport FROM Metadata");
