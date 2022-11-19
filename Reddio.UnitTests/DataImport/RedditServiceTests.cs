@@ -29,21 +29,26 @@ namespace Reddio.UnitTests.DataImport
 
         private readonly RedditService _RedditService;
 
+        private readonly RedditConfiguration _RedditConfiguration;
+
         private readonly Mock<HttpMessageHandler> _HttpMessageHandlerMock;
 
         private readonly List<HttpRequestMessage> _Requests;
 
         public RedditServiceTests()
         {
-            ConfigurationMock.Setup(c => c["Reddit:Username"]).Returns(_Username);
-            ConfigurationMock.Setup(c => c["Reddit:Password"]).Returns(_Password);
-            ConfigurationMock.Setup(c => c["Reddit:ClientId"]).Returns(_ClientId);
-            ConfigurationMock.Setup(c => c["Reddit:ClientSecret"]).Returns(_ClientSecret);
-            ConfigurationMock.Setup(c => c["Reddit:BatchSize"]).Returns(_BatchSize.ToString());
-            ConfigurationMock.Setup(c => c["Reddit:UserAgent"]).Returns(_UserAgent);
+            _RedditConfiguration = new RedditConfiguration()
+            {
+                Username = _Username,
+                Password = _Password,
+                ClientId = _ClientId,
+                ClientSecret = _ClientSecret,
+                BatchSize = _BatchSize,
+                UserAgent = _UserAgent
+            };
             _HttpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpClient = new HttpClient(_HttpMessageHandlerMock.Object);
-            _RedditService = new RedditService(httpClient, ConfigurationMock.Object, new MemoryCache(new MemoryCacheOptions()));
+            _RedditService = new RedditService(httpClient, _RedditConfiguration, new MemoryCache(new MemoryCacheOptions()));
             _Requests = new List<HttpRequestMessage>();
         }
 

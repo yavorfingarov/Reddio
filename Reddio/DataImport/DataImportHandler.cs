@@ -13,25 +13,24 @@
 
         private readonly DataImportWatcher _DataImportWatcher;
 
-        private readonly IConfiguration _Configuration;
+        private readonly DataImportConfiguration _DataImportConfiguration;
 
         private readonly ILogger<DataImportHandler> _Logger;
 
         public DataImportHandler(IDbConnection db, IRedditService redditService, DataImportWatcher dataImportWatcher,
-            IConfiguration configuration, ILogger<DataImportHandler> logger)
+            DataImportConfiguration dataImportConfiguration, ILogger<DataImportHandler> logger)
         {
             _Db = db;
             _RedditService = redditService;
             _DataImportWatcher = dataImportWatcher;
-            _Configuration = configuration;
+            _DataImportConfiguration = dataImportConfiguration;
             _Logger = logger;
         }
 
         public async Task HandleAsync()
         {
             var lastUpdate = _Db.QuerySingle<DateTime>("SELECT LastImport FROM Metadata");
-            var dataImportPeriod = int.Parse(_Configuration["DataImport:Period"]);
-            if (DateTime.UtcNow - lastUpdate < TimeSpan.FromHours(dataImportPeriod) - TimeSpan.FromMinutes(5))
+            if (DateTime.UtcNow - lastUpdate < TimeSpan.FromHours(_DataImportConfiguration.Period) - TimeSpan.FromMinutes(5))
             {
                 return;
             }

@@ -4,17 +4,18 @@
     {
         private readonly ILogger<DataImportHostedService> _Logger;
 
-        private readonly IConfiguration _Configuration;
+        private readonly DataImportConfiguration _DataImportConfiguration;
 
         private readonly IServiceProvider _ServiceProvider;
 
         private Timer? _Timer;
 
-        public DataImportHostedService(ILogger<DataImportHostedService> logger, IConfiguration configuration,
+        public DataImportHostedService(ILogger<DataImportHostedService> logger,
+            DataImportConfiguration dataImportConfiguration,
             IServiceProvider serviceProvider)
         {
             _Logger = logger;
-            _Configuration = configuration;
+            _DataImportConfiguration = dataImportConfiguration;
             _ServiceProvider = serviceProvider;
         }
 
@@ -26,8 +27,7 @@
                 var dataImportHandler = scope.ServiceProvider.GetRequiredService<IDataImportHandler>();
                 await ImportDataAsync(dataImportHandler);
             };
-            var period = int.Parse(_Configuration["DataImport:HostedServicePeriod"]);
-            _Timer = new Timer(importData, null, TimeSpan.Zero, TimeSpan.FromHours(period));
+            _Timer = new Timer(importData, null, TimeSpan.Zero, TimeSpan.FromHours(_DataImportConfiguration.HostedServicePeriod));
 
             return Task.CompletedTask;
         }
@@ -51,6 +51,9 @@
             return Task.CompletedTask;
         }
 
-        public void Dispose() => _Timer?.Dispose();
+        public void Dispose()
+        {
+            _Timer?.Dispose();
+        }
     }
 }

@@ -18,26 +18,26 @@ namespace Reddio.DataImport
 
         private readonly HttpClient _HttpClient;
 
-        private readonly IConfiguration _Configuration;
+        private readonly RedditConfiguration _RedditConfiguration;
 
         private readonly IMemoryCache _MemoryCache;
 
-        public RedditService(HttpClient httpClient, IConfiguration configuration, IMemoryCache memoryCache)
+        public RedditService(HttpClient httpClient, RedditConfiguration redditConfiguration, IMemoryCache memoryCache)
         {
             _HttpClient = httpClient;
-            _Configuration = configuration;
+            _RedditConfiguration = redditConfiguration;
             _MemoryCache = memoryCache;
             _HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("user-agent",
-                string.Format(_Configuration["Reddit:UserAgent"], _Configuration["Reddit:Username"]));
+                string.Format(_RedditConfiguration.UserAgent, _RedditConfiguration.Username));
         }
 
         public async Task<IEnumerable<CommentThreadData>> GetListingAsync(string subreddit,
             int threadCount, string sort, string? period = null)
         {
             var listing = new List<CommentThreadData>();
-            var batchSize = int.Parse(_Configuration["Reddit:BatchSize"]);
-            var batchSizes = Enumerable.Repeat(batchSize, threadCount / batchSize)
-                .Concat(threadCount % batchSize == 0 ? Array.Empty<int>() : new[] { threadCount % batchSize })
+            var batchSizes = Enumerable.Repeat(_RedditConfiguration.BatchSize, threadCount / _RedditConfiguration.BatchSize)
+                .Concat(threadCount % _RedditConfiguration.BatchSize == 0 ?
+                    Enumerable.Empty<int>() : new[] { threadCount % _RedditConfiguration.BatchSize })
                 .ToArray();
             string? after = null;
             foreach (var currentBatchSize in batchSizes)
@@ -93,10 +93,10 @@ namespace Reddio.DataImport
         private async Task<TokenResponse> GetTokenAsync()
         {
             var url = $"https://www.reddit.com/api/v1/access_token?grant_type=password" +
-                $"&username={_Configuration["Reddit:Username"]}&password={_Configuration["Reddit:Password"]}";
+                $"&username={_RedditConfiguration.Username}&password={_RedditConfiguration.Password}";
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             var basicToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(
-                $"{_Configuration["Reddit:ClientId"]}:{_Configuration["Reddit:ClientSecret"]}"));
+                $"{_RedditConfiguration.ClientId}:{_RedditConfiguration.ClientSecret}"));
             request.Headers.Add("authorization", $"basic {basicToken}");
             var response = await _HttpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
@@ -120,4 +120,20 @@ namespace Reddio.DataImport
     public record CommentThread(CommentThreadData Data);
 
     public record CommentThreadData(string Id, string Title, string Url);
+
+    [Configuration("Reddit")]
+    public class RedditConfiguration
+    {
+        public string Username { get; set; } = null!;
+
+        public string Password { get; set; } = null!;
+
+        public string ClientId { get; set; } = null!;
+
+        public string ClientSecret { get; set; } = null!;
+
+        public int BatchSize { get; set; }
+
+        public string UserAgent { get; set; } = null!;
+    }
 }

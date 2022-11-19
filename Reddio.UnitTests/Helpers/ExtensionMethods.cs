@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Reddio.UnitTests.Helpers
@@ -18,14 +17,6 @@ namespace Reddio.UnitTests.Helpers
             logger.Verify(l => l.Log(logLevel, It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(messagePart)),
                 exception, It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)), Times.Once);
-        }
-
-        public static void Verify(this Mock<IConfiguration> configurationMock, params string[] keys)
-        {
-            foreach (var key in keys)
-            {
-                configurationMock.Verify(c => c[key], Times.Once);
-            }
         }
 
         public static int? GetStatusCode(this IResult result) => (int?)result.GetType().GetProperty("StatusCode")?.GetValue(result);

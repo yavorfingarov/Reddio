@@ -43,6 +43,8 @@ namespace Reddio
 
             builder.Host.UseNLog();
 
+            builder.ConfigureServices();
+
             builder.Services.AddScoped<IDbConnection>(sp => new SqliteConnection(builder.Configuration.GetConnectionString("Default")));
 
             builder.Services.AddScoped<IDataImportHandler, DataImportHandler>();
