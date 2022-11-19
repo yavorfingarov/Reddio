@@ -4,16 +4,10 @@ namespace Reddio.UnitTests.Api
 {
     public class HealthEndpointTests : TestBaseFor<HealthEndpoint>
     {
-        public HealthEndpointTests()
-        {
-            ConfigurationMock.Setup(c => c["DataImport:Period"]).Returns("6");
-            ConfigurationMock.Setup(c => c["DataImport:HostedServicePeriod"]).Returns("1");
-        }
-
         [Fact]
         public void Handle_Returns500_WhenLastImportIsInitial()
         {
-            var result = HealthEndpoint.Handle(Db, ConfigurationMock.Object);
+            var result = HealthEndpoint.Handle(Db, DataImportConfiguration);
 
             Assert.Equal(500, result.GetStatusCode());
         }
@@ -23,7 +17,7 @@ namespace Reddio.UnitTests.Api
         {
             Db.Execute("UPDATE Metadata SET LastImport = @LastImport", new { LastImport = DateTime.UtcNow.AddHours(-14) });
 
-            var result = HealthEndpoint.Handle(Db, ConfigurationMock.Object);
+            var result = HealthEndpoint.Handle(Db, DataImportConfiguration);
 
             Assert.Equal(500, result.GetStatusCode());
         }
@@ -33,7 +27,7 @@ namespace Reddio.UnitTests.Api
         {
             Db.Execute("UPDATE Metadata SET LastImport = @LastImport", new { LastImport = DateTime.UtcNow.AddHours(-13) });
 
-            var result = HealthEndpoint.Handle(Db, ConfigurationMock.Object);
+            var result = HealthEndpoint.Handle(Db, DataImportConfiguration);
 
             Assert.Equal(200, result.GetStatusCode());
         }

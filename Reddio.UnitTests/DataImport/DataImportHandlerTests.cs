@@ -13,11 +13,10 @@ namespace Reddio.UnitTests.DataImport
 
         public DataImportHandlerTests()
         {
-            ConfigurationMock.Setup(c => c["DataImport:Period"]).Returns("6");
             _RedditServiceMock = new Mock<IRedditService>(MockBehavior.Strict);
             _DataImportWatcher = new DataImportWatcher();
             _DataImportHandler = new DataImportHandler(Db, _RedditServiceMock.Object, _DataImportWatcher,
-                ConfigurationMock.Object, LoggerMock.Object);
+                DataImportConfiguration, LoggerMock.Object);
         }
 
         [Fact]

@@ -4,13 +4,12 @@
     public class QueueEndpoint
     {
         [Post("/api/queue")]
-        public static IResult Handle(QueueRequest request, IDbConnection db, IConfiguration configuration)
+        public static IResult Handle(QueueRequest request, IDbConnection db, QueueConfiguration queueConfiguration)
         {
-            var queueLength = int.Parse(configuration["QueueLength"]);
-            var queue = GetQueue(db, request.Station, queueLength, request.IgnoreThreadIds);
+            var queue = GetQueue(db, request.Station, queueConfiguration.Length, request.IgnoreThreadIds);
             if (!queue.Any())
             {
-                queue = GetQueue(db, request.Station, queueLength, Enumerable.Empty<string>());
+                queue = GetQueue(db, request.Station, queueConfiguration.Length, Enumerable.Empty<string>());
             }
             if (!queue.Any())
             {
@@ -49,4 +48,10 @@
     public record QueueRequest(string Station, IEnumerable<string> IgnoreThreadIds);
 
     public record Track(string ThreadId, string Title, string Url);
+
+    [Configuration("Queue")]
+    public class QueueConfiguration
+    {
+        public int Length { get; set; }
+    }
 }
