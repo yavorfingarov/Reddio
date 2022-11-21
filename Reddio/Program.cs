@@ -86,7 +86,7 @@ namespace Reddio
 
             app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), branch =>
             {
-                branch.UseMiddleware<ExceptionHandler>();
+                branch.UseExceptionHandling();
 
                 branch.UseMiddleware<DataImportWatcher>();
 
@@ -107,6 +107,7 @@ namespace Reddio
         private static void MigrateDb(WebApplication app)
         {
             var dataDirectory = app.Configuration["DataDirectory"];
+            ArgumentNullException.ThrowIfNull(dataDirectory);
             Directory.CreateDirectory(dataDirectory);
             AppDomain.CurrentDomain.SetData("DataDirectory", dataDirectory);
             var upgrader = DeployChanges.To

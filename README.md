@@ -12,7 +12,7 @@ A small web application for listening to music from selected Reddit communities.
 
 ## Tech stack
 
-* ASP.NET Core 6 Razor Pages / Reprise
+* ASP.NET Core 7 Razor Pages / Reprise
 * SQLite / Dapper / DbUp
 * NLog / SimpleRequestLogger
 * Xunit / Moq / HtmlAgilityPack
