@@ -7,7 +7,7 @@ on:
       - 'Reddio/**'
 
 env:
-  DOTNET_VERSION: 6.0.x
+  DOTNET_VERSION: 7.0.x
   CSPROJ_PATH: Reddio/Reddio.csproj
   AZURE_WEBAPP_NAME: Reddio
   AZURE_WEBAPP_PACKAGE_PATH: './app'
