@@ -2,7 +2,6 @@ using DbUp;
 using Microsoft.Data.Sqlite;
 using NLog;
 using NLog.Web;
-using Reddio.Api;
 using Reddio.DataImport;
 using SimpleRequestLogger;
 
