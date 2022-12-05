@@ -21,7 +21,7 @@
     <PackageReference Include="dbup-sqlite" Version="5.0.8" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.0" />
-    <PackageReference Include="Reprise" Version="3.1.1" />
+    <PackageReference Include="Reprise" Version="3.1.2" />
     <PackageReference Include="SimpleRequestLogger" Version="3.1.0" />
   </ItemGroup>
 
