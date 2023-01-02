@@ -14,7 +14,7 @@ namespace Reddio.DataImport
                 {
                     sb.Append('_');
                 }
-                sb.Append(char.ToLower(name[i]));
+                sb.Append(char.ToLower(name[i], CultureInfo.InvariantCulture));
             }
 
             return sb.ToString();

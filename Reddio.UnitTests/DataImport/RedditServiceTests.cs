@@ -248,8 +248,8 @@ namespace Reddio.UnitTests.DataImport
             {
                 Content = JsonContent.Create(listingResponseBody, options: _JsonSerializerOptions)
             };
-            listingResponse.Headers.Add("x-ratelimit-remaining", rateLimitRemaining.ToString());
-            listingResponse.Headers.Add("x-ratelimit-reset", 2.ToString());
+            listingResponse.Headers.Add("x-ratelimit-remaining", rateLimitRemaining.ToString(CultureInfo.InvariantCulture));
+            listingResponse.Headers.Add("x-ratelimit-reset", 2.ToString(CultureInfo.InvariantCulture));
 
             return listingResponse;
         }

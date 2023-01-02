@@ -9,11 +9,11 @@ namespace Reddio.UnitTests.Helpers
 {
     public abstract class TestBaseFor<T> : IDisposable
     {
-        public Mock<ILogger<T>> LoggerMock;
+        public Mock<ILogger<T>> LoggerMock { get; }
 
-        public DataImportConfiguration DataImportConfiguration;
+        public DataImportConfiguration DataImportConfiguration { get; }
 
-        public IDbConnection Db;
+        public IDbConnection Db { get; }
 
         public TestBaseFor()
         {

@@ -151,7 +151,7 @@ namespace Reddio.IntegrationTests
                     continue;
                 }
 
-                var response = link.StartsWith("https://") ?
+                var response = link.StartsWith("https://", StringComparison.InvariantCulture) ?
                     await _Fixture.ExternalClient.GetAsync(link) :
                     await _Fixture.Client.GetAsync(link);
 
