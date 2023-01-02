@@ -39,7 +39,7 @@
                 predicates.Add("t.ThreadId NOT IN @IgnoreThreadIds");
                 parameters["IgnoreThreadIds"] = ignoreThreadIds;
             }
-            var queue = db.Query<Track>(string.Format(query, string.Join(" AND ", predicates)), parameters);
+            var queue = db.Query<Track>(string.Format(CultureInfo.InvariantCulture, query, string.Join(" AND ", predicates)), parameters);
 
             return queue;
         }

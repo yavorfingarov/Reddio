@@ -100,7 +100,7 @@
             var affectedRows = 0;
             foreach (var track in tracks)
             {
-                if (knownDomains.Any(kd => track.Url.StartsWith(kd)))
+                if (knownDomains.Any(kd => track.Url.StartsWith(kd, StringComparison.InvariantCulture)))
                 {
                     affectedRows += _Db.Execute(
                         "INSERT INTO Track (StationId, ThreadId, Title, Url) " +

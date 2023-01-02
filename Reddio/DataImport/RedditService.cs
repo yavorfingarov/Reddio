@@ -28,7 +28,7 @@ namespace Reddio.DataImport
             _RedditConfiguration = redditConfiguration;
             _MemoryCache = memoryCache;
             _HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("user-agent",
-                string.Format(_RedditConfiguration.UserAgent, _RedditConfiguration.Username));
+                string.Format(CultureInfo.InvariantCulture, _RedditConfiguration.UserAgent, _RedditConfiguration.Username));
         }
 
         public async Task<IEnumerable<CommentThreadData>> GetListingAsync(string subreddit,
@@ -76,10 +76,11 @@ namespace Reddio.DataImport
             request.Headers.Add("authorization", authorizationHeader);
             var response = await _HttpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
-            var rateLimitRemaining = (int)double.Parse(response.Headers.GetValues("x-ratelimit-remaining").Single());
+            var rateLimitRemaining = (int)double.Parse(response.Headers.GetValues("x-ratelimit-remaining").Single(), CultureInfo.InvariantCulture);
             if (rateLimitRemaining == 0)
             {
-                await Task.Delay(((int)double.Parse(response.Headers.GetValues("x-ratelimit-reset").Single()) * 1000) + 2000);
+                var rateLimitReset = (int)double.Parse(response.Headers.GetValues("x-ratelimit-reset").Single(), CultureInfo.InvariantCulture);
+                await Task.Delay((rateLimitReset * 1000) + 2000);
             }
             var listingResponse = await response.Content.ReadFromJsonAsync<ListingResponse>(_JsonSerializerOptions);
             if (listingResponse?.Data?.Children == null || !listingResponse.Data.Children.Any())
