@@ -2,7 +2,7 @@ namespace Reddio.Pages
 {
     public class ErrorModel : PageModel
     {
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = null!;
 
         public void OnGet()
         {

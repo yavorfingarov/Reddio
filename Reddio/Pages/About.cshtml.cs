@@ -2,7 +2,7 @@ namespace Reddio.Pages
 {
     public class AboutModel : PageModel
     {
-        public IEnumerable<(string Name, int TrackCount)> Stations { get; set; } = new List<(string, int)>();
+        public IEnumerable<(string Name, int TrackCount)> Stations { get; set; } = null!;
 
         public DateTime LastUpdate { get; set; }
 

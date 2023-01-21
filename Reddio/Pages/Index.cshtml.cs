@@ -2,7 +2,7 @@ namespace Reddio.Pages
 {
     public class IndexModel : PageModel
     {
-        public IEnumerable<string> Stations { get; set; } = new List<string>();
+        public IEnumerable<string> Stations { get; set; } = null!;
 
         private readonly IDbConnection _Db;
 
