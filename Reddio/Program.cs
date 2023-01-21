@@ -74,6 +74,19 @@ namespace Reddio
         {
             app.UseRequestLogging();
 
+            app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), apiBranch =>
+            {
+                apiBranch.UseExceptionHandling();
+
+                apiBranch.UseHttpsRedirection();
+
+                apiBranch.UseMiddleware<DataImportWatcher>();
+
+                apiBranch.UseRouting();
+
+                apiBranch.UseEndpoints(endpoints => endpoints.MapEndpoints());
+            });
+
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
@@ -82,17 +95,6 @@ namespace Reddio
             }
 
             app.UseHttpsRedirection();
-
-            app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), branch =>
-            {
-                branch.UseExceptionHandling();
-
-                branch.UseMiddleware<DataImportWatcher>();
-
-                branch.UseRouting();
-
-                branch.UseEndpoints(endpoints => endpoints.MapEndpoints());
-            });
 
             app.UseStaticFiles();
 

@@ -69,7 +69,7 @@ namespace Reddio.DataImport
             var authorizationHeader = await _MemoryCache.GetOrCreateAsync("OAuthToken", async entry =>
             {
                 var token = await GetTokenAsync();
-                entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddSeconds(token.ExpiresIn);
+                entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddSeconds(token.ExpiresIn - 5);
 
                 return $"{token.TokenType} {token.AccessToken}";
             });
