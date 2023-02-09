@@ -18,15 +18,13 @@ env:
   REDDIT__PASSWORD: ${{ secrets.REDDIT__PASSWORD }}
   REDDIT__USERNAME: ${{ secrets.REDDIT__USERNAME }}
   AZURE_WEBAPP_NAME: Reddio
-  AZURE_WEBAPP_PACKAGE_PATH: './app'
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    environment:
-      name: Production
-      url: ${{ steps.deploy-to-azure.outputs.webapp-url }}
+    outputs:
+      should-deploy: ${{ github.event_name == 'push' && steps.changed-src.outputs.changed == 'true' }}
     steps:
 
       - name: Check out repository
@@ -169,16 +167,39 @@ jobs:
         uses: marceloprado/has-changed-path@v1.0.1
         with:
           paths: ${{ env.SRC_PATH }}
-      
+
       - name: Create package
-        if: ${{ github.event_name == 'push' && steps.changed-src.outputs.changed == 'true' }}
-        run: dotnet publish --no-build --configuration Release --output ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} ${{ env.CSPROJ_PATH }}
+        if: ${{ github.event_name == 'push' }}
+        run: dotnet publish --no-build --configuration Release --output ./app ${{ env.CSPROJ_PATH }}
       
+      - name: Upload build artifact
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: app
+          path: ./app
+
+  deploy:
+    name: Deploy
+    needs: build
+    if: ${{ needs.build.outputs.should-deploy }}
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: ${{ steps.deploy-to-azure.outputs.webapp-url }}
+    steps:
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: app
+          path: ./app
+
       - name: Deploy to Azure App Service
-        if: ${{ github.event_name == 'push' && steps.changed-src.outputs.changed == 'true' }}
         id: deploy-to-azure
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          package: ./app
+
