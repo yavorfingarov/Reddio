@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reddio", "Reddio\Reddio.csproj", "{C48935DB-CE2F-40AB-BC80-B5DB9C8DC1E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reddio", "src\Reddio\Reddio.csproj", "{C48935DB-CE2F-40AB-BC80-B5DB9C8DC1E4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reddio.UnitTests", "Reddio.UnitTests\Reddio.UnitTests.csproj", "{DB8F4961-3958-4015-9ECF-9AC945A78C35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reddio.UnitTests", "tests\Reddio.UnitTests\Reddio.UnitTests.csproj", "{DB8F4961-3958-4015-9ECF-9AC945A78C35}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reddio.IntegrationTests", "Reddio.IntegrationTests\Reddio.IntegrationTests.csproj", "{023D61E8-7885-437A-AD82-522863AAB5E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reddio.IntegrationTests", "tests\Reddio.IntegrationTests\Reddio.IntegrationTests.csproj", "{023D61E8-7885-437A-AD82-522863AAB5E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
