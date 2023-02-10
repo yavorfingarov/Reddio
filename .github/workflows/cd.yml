@@ -75,7 +75,7 @@ jobs:
         working-directory: ${{ env.UNIT_TESTS_PATH }}
 
       - name: Run mutation tests
-        run: ./tools/dotnet-stryker --reporter "html" --reporter "markdown"
+        run: ./tools/dotnet-stryker --config-file stryker-config.yaml
         working-directory: ${{ env.UNIT_TESTS_PATH }}
 
       - name: Upload coverage report
