@@ -1,4 +1,7 @@
-﻿namespace Reddio.DataImport
+﻿using System.Threading;
+using System.Timers;
+
+namespace Reddio.DataImport
 {
     public sealed class DataImportBackgroundService : BackgroundService
     {
@@ -6,37 +9,45 @@
 
         private readonly DataImportConfiguration _DataImportConfiguration;
 
-        private readonly IServiceProvider _ServiceProvider;
+        private readonly IServiceScopeFactory _ServiceScopeFactory;
 
         public DataImportBackgroundService(ILogger<DataImportBackgroundService> logger,
             DataImportConfiguration dataImportConfiguration,
-            IServiceProvider serviceProvider)
+            IServiceScopeFactory serviceScopeFactory)
         {
             _Logger = logger;
             _DataImportConfiguration = dataImportConfiguration;
-            _ServiceProvider = serviceProvider;
+            _ServiceScopeFactory = serviceScopeFactory;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            using var timer = new PeriodicTimer(TimeSpan.FromHours(_DataImportConfiguration.HostedServicePeriod));
             do
             {
-                using var scope = _ServiceProvider.CreateScope();
+                using var scope = _ServiceScopeFactory.CreateScope();
                 var dataImportHandler = scope.ServiceProvider.GetRequiredService<IDataImportHandler>();
-                await ImportDataAsync(dataImportHandler, stoppingToken);
-            } while (await timer.WaitForNextTickAsync(stoppingToken) && !stoppingToken.IsCancellationRequested);
+                try
+                {
+                    await dataImportHandler.HandleAsync(stoppingToken);
+                }
+                catch (Exception ex)
+                {
+                    _Logger.LogError(ex, "Could not import data.");
+                }
+            } while (await IsWaiting(stoppingToken));
         }
 
-        public async Task ImportDataAsync(IDataImportHandler dataImportHandler, CancellationToken cancellationToken)
+        private async Task<bool> IsWaiting(CancellationToken cancellationToken)
         {
             try
             {
-                await dataImportHandler.HandleAsync(cancellationToken);
+                await Task.Delay(TimeSpan.FromHours(_DataImportConfiguration.HostedServicePeriod), cancellationToken);
+
+                return true;
             }
-            catch (Exception ex)
+            catch (OperationCanceledException)
             {
-                _Logger.LogError(ex, "Could not import data.");
+                return false;
             }
         }
     }
