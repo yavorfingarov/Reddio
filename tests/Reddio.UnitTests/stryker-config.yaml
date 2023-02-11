@@ -1,0 +1,3 @@
+﻿stryker-config:
+  mutate: [ '!**/Reddio/Program.cs' ]
+  reporters: [ 'html', 'markdown' ]

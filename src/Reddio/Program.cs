@@ -20,7 +20,7 @@ namespace Reddio
                 var builder = WebApplication.CreateBuilder(args);
                 ConfigureServices(builder);
                 var app = builder.Build();
-                logger.Debug($"Environment: {app.Environment.EnvironmentName}");
+                app.Logger.LogDebug("Environment: {Environment}", app.Environment.EnvironmentName);
                 Configure(app);
                 MigrateDb(app);
                 app.Run();
@@ -50,7 +50,7 @@ namespace Reddio
 
             builder.Services.AddSingleton<DataImportWatcher>();
 
-            builder.Services.AddHostedService<DataImportHostedService>();
+            builder.Services.AddHostedService<DataImportBackgroundService>();
 
             builder.Services.AddHttpClient<IRedditService, RedditService>();
 

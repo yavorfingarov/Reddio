@@ -168,7 +168,7 @@ namespace Reddio.IntegrationTests
 
             Assert.Equal(new[] { "head", "body" }, htmlRoot.SelectNodes("/html/*").Select(n => n.Name));
 
-            Assert.Equal(new[] { "meta", "meta", "meta", "meta", "meta", "meta", "title", "link", "link", "link", "link" },
+            Assert.Equal(new[] { "meta", "meta", "meta", "meta", "meta", "meta", "title", "link", "link", "link" },
                 htmlRoot.SelectNodes("/html/head/*").Select(n => n.Name));
 
             var metaNodes = htmlRoot.SelectNodes("/html/head/meta");
@@ -188,19 +188,21 @@ namespace Reddio.IntegrationTests
 
             Assert.Contains("reddio", htmlRoot.SelectSingleNode("/html/head/title").InnerText);
 
-            Assert.Equal(new[] { "stylesheet", "stylesheet", "manifest", "icon" },
+            Assert.Equal(new[] { "stylesheet", "manifest", "icon" },
                 htmlRoot.SelectNodes("/html/head/link").Select(n => n.Attributes["rel"].Value));
-            Assert.Equal(new[] { "https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css", "/styles.css", "/manifest.json", "/icon32.png" },
+            Assert.Equal(new[] { "/styles.css", "/manifest.json", "/icon32.png" },
                 htmlRoot.SelectNodes("/html/head/link").Select(n => n.Attributes["href"].Value));
 
             Assert.Equal(new[] { "header", "noscript", "main", "script", "footer" },
                 htmlRoot.SelectNodes("/html/body/*").Select(n => n.Name));
 
-            Assert.Equal("reddio", htmlRoot.SelectSingleNode("/html/body/header/span").InnerText.Trim());
+            Assert.Equal("reddio", htmlRoot.SelectSingleNode("/html/body/header/div").InnerText.Trim());
 
-            AssertLinks(htmlRoot.SelectNodes("/html/body/footer/*"),
+            Assert.Equal(2, htmlRoot.SelectNodes("/html/body/footer/*").Count);
+            AssertLinks(htmlRoot.SelectNodes("/html/body/footer/div[1]/*"),
                 ("/About", "About"), ("/Privacy", "Privacy"), ("/License", "License"),
                 ("https://github.com/yavorfingarov/Reddio", "GitHub"));
+            Assert.Contains("Build:", htmlRoot.SelectNodes("/html/body/footer/div[2]").Single().InnerText);
         }
 
         private static void AssertLinks(HtmlNodeCollection nodes, params (string Route, string Text)[] links)

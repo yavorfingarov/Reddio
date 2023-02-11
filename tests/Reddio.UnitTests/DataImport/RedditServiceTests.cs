@@ -63,7 +63,7 @@ namespace Reddio.UnitTests.DataImport
             SetupHttpClientResponse($"https://www.reddit.com/api/v1/access_token?grant_type=password" +
                 $"&username={_Username}&password={_Password}", tokenResponse);
 
-            await Assert.ThrowsAsync<HttpRequestException>(async () => await _RedditService.GetListingAsync("test", 100, "new"));
+            await Assert.ThrowsAsync<HttpRequestException>(async () => await _RedditService.GetListingAsync("test", 100, "new", null, CancellationToken.None));
             Assert.Equal("test (https://reddio.test) by /u/testUsername", _Requests.Single().Headers?.UserAgent?.ToString());
             Assert.Equal("basic dGVzdENsaWVudElkOnRlc3RDbGllbnRTZWNyZXQ=", _Requests.Single().Headers?.Authorization?.ToString());
         }
@@ -79,7 +79,7 @@ namespace Reddio.UnitTests.DataImport
                 $"&username={_Username}&password={_Password}", tokenResponse);
 
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-                async () => await _RedditService.GetListingAsync("test", 100, "new"));
+                async () => await _RedditService.GetListingAsync("test", 100, "new", null, CancellationToken.None));
             Assert.Equal("Failed to get authorization token.", exception.Message);
             Assert.Equal("test (https://reddio.test) by /u/testUsername", _Requests.Single().Headers?.UserAgent?.ToString());
             Assert.Equal("basic dGVzdENsaWVudElkOnRlc3RDbGllbnRTZWNyZXQ=", _Requests.Single().Headers?.Authorization?.ToString());
@@ -101,7 +101,7 @@ namespace Reddio.UnitTests.DataImport
             var listingResponse = new HttpResponseMessage(statusCode);
             SetupHttpClientResponse($"https://oauth.reddit.com/r/test/new?limit=100", listingResponse);
 
-            await Assert.ThrowsAsync<HttpRequestException>(async () => await _RedditService.GetListingAsync("test", 100, "new"));
+            await Assert.ThrowsAsync<HttpRequestException>(async () => await _RedditService.GetListingAsync("test", 100, "new", null, CancellationToken.None));
             Assert.Equal(2, _Requests.Count);
             Assert.Equal("basic dGVzdENsaWVudElkOnRlc3RDbGllbnRTZWNyZXQ=", _Requests[0].Headers?.Authorization?.ToString());
             Assert.Equal("bearer testToken123", _Requests[1].Headers?.Authorization?.ToString());
@@ -123,7 +123,7 @@ namespace Reddio.UnitTests.DataImport
             SetupHttpClientResponse($"https://oauth.reddit.com/r/test/new?limit=100", listingResponse);
 
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-                async () => await _RedditService.GetListingAsync("test", 100, "new"));
+                async () => await _RedditService.GetListingAsync("test", 100, "new", null, CancellationToken.None));
             Assert.Equal("Failed to get listing response.", exception.Message);
             Assert.Equal(2, _Requests.Count);
             Assert.Equal("basic dGVzdENsaWVudElkOnRlc3RDbGllbnRTZWNyZXQ=", _Requests[0].Headers?.Authorization?.ToString());
@@ -144,7 +144,7 @@ namespace Reddio.UnitTests.DataImport
             var listingResponse = CreateBatchResponse(0, 100, 10);
             SetupHttpClientResponse($"https://oauth.reddit.com/r/test/new?limit=100", listingResponse);
 
-            var listing = await _RedditService.GetListingAsync("test", 100, "new");
+            var listing = await _RedditService.GetListingAsync("test", 100, "new", null, CancellationToken.None);
             Assert.Equal(Enumerable.Range(0, 100).Select(i => $"thread{i}"), listing.Select(t => t.Id));
             Assert.Equal(2, _Requests.Count);
             Assert.Equal("basic dGVzdENsaWVudElkOnRlc3RDbGllbnRTZWNyZXQ=", _Requests[0].Headers?.Authorization?.ToString());
@@ -169,7 +169,7 @@ namespace Reddio.UnitTests.DataImport
             SetupHttpClientResponse($"https://oauth.reddit.com/r/test/new?limit=100&after=after0", listingResponse2);
             SetupHttpClientResponse($"https://oauth.reddit.com/r/test/new?limit=50&after=after1", listingResponse3);
 
-            var listing = await _RedditService.GetListingAsync("test", 250, "new");
+            var listing = await _RedditService.GetListingAsync("test", 250, "new", null, CancellationToken.None);
             Assert.Equal(Enumerable.Range(0, 250).Select(i => $"thread{i}").ToList(), listing.Select(t => t.Id).ToList());
             Assert.Equal(4, _Requests.Count);
             Assert.Equal("basic dGVzdENsaWVudElkOnRlc3RDbGllbnRTZWNyZXQ=", _Requests[0].Headers?.Authorization?.ToString());
@@ -191,7 +191,7 @@ namespace Reddio.UnitTests.DataImport
             var listingResponse = CreateBatchResponse(0, 100, 10);
             SetupHttpClientResponse($"https://oauth.reddit.com/r/test/best?limit=100&t=day", listingResponse);
 
-            var listing = await _RedditService.GetListingAsync("test", 100, "best", "day");
+            var listing = await _RedditService.GetListingAsync("test", 100, "best", "day", CancellationToken.None);
             Assert.Equal(Enumerable.Range(0, 100).Select(i => $"thread{i}"), listing.Select(t => t.Id));
             Assert.Equal(2, _Requests.Count);
             Assert.Equal("basic dGVzdENsaWVudElkOnRlc3RDbGllbnRTZWNyZXQ=", _Requests[0].Headers?.Authorization?.ToString());
@@ -217,7 +217,7 @@ namespace Reddio.UnitTests.DataImport
             SetupHttpClientResponse($"https://oauth.reddit.com/r/test/new?limit=50&after=after1", listingResponse3);
 
             var sw = Stopwatch.StartNew();
-            var listing = await _RedditService.GetListingAsync("test", 250, "new");
+            var listing = await _RedditService.GetListingAsync("test", 250, "new", null, CancellationToken.None);
             sw.Stop();
             Assert.True(sw.ElapsedMilliseconds > 4000);
             Assert.Equal(Enumerable.Range(0, 250).Select(i => $"thread{i}").ToList(), listing.Select(t => t.Id).ToList());

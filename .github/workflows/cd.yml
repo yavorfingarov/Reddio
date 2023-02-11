@@ -3,39 +3,208 @@ name: CD
 on:
   push:
     branches: [ master ]
-    paths: 
-      - 'Reddio/**'
+  pull_request:
+    branches: [ master ]
 
 env:
   DOTNET_VERSION: 7.0.x
-  CSPROJ_PATH: Reddio/Reddio.csproj
+  SRC_PATH: ./src
+  CSPROJ_PATH: ./src/Reddio/Reddio.csproj
+  UNIT_TESTS_PATH: ./tests/Reddio.UnitTests
+  MIN_COVERAGE: 90
+  GIST_ID: d850286102a68e918ab12089f7497d60
+  REDDIT__CLIENTID: ${{ secrets.REDDIT__CLIENTID }}
+  REDDIT__CLIENTSECRET: ${{ secrets.REDDIT__CLIENTSECRET }}
+  REDDIT__PASSWORD: ${{ secrets.REDDIT__PASSWORD }}
+  REDDIT__USERNAME: ${{ secrets.REDDIT__USERNAME }}
   AZURE_WEBAPP_NAME: Reddio
-  AZURE_WEBAPP_PACKAGE_PATH: './app'
 
 jobs:
   build:
+    name: Build
+    runs-on: ubuntu-latest
+    outputs:
+      should-deploy: ${{ steps.changed-src.outputs.changed }}
+    steps:
+
+      - name: Get timestamp
+        run: echo "TIMESTAMP=$(date +'%Y%m%d%H%M')" >> $GITHUB_ENV
+
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Analyze code
+        run: dotnet format --no-restore --verify-no-changes --severity info
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release --version-suffix ${{ env.TIMESTAMP }}
+
+      - name: Run unit tests
+        run: >
+          dotnet test --no-build --configuration Release --filter UnitTests --logger html 
+          --collect:"XPlat Code Coverage" --results-directory ${{ env.UNIT_TESTS_PATH }}/coverage
+
+      - name: Run integration tests
+        run: dotnet test --no-build --configuration Release --filter IntegrationTests --logger html
+
+      - name: Upload test results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: TestResults-${{ env.TIMESTAMP }}
+          path: |
+            '**/TestResults'
+            '**/*.received.*'
+
+      - name: Generate test coverage report
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.17
+        with:
+          reports: '${{ env.UNIT_TESTS_PATH }}/coverage/**/coverage.cobertura.xml'
+          targetdir: '${{ env.UNIT_TESTS_PATH }}/TestCoverageReport'
+          filefilters: '-**/Program.cs;-*.cshtml'
+          reporttypes: 'Html;CsvSummary'
+
+      - name: Set up Stryker
+        run: dotnet tool install dotnet-stryker --tool-path ./tools
+        working-directory: ${{ env.UNIT_TESTS_PATH }}
+
+      - name: Run mutation tests
+        run: ./tools/dotnet-stryker --config-file stryker-config.yaml
+        working-directory: ${{ env.UNIT_TESTS_PATH }}
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: CoverageReport-${{ env.TIMESTAMP }}
+          path: |
+            ${{ env.UNIT_TESTS_PATH }}/TestCoverageReport/
+            ${{ env.UNIT_TESTS_PATH }}/StrykerOutput/
+
+      - name: Analyze coverage report
+        id: analyze-coverage-report
+        run: |
+          set_output() {
+            if [[ -z $3 ]]; then
+              echo "::error::Got an empty value for $1."
+              exit 1
+            fi
+            echo "$1=$3$4" >> $GITHUB_OUTPUT
+            echo "* $2: **$3$4**" >> $GITHUB_STEP_SUMMARY
+          }
+          set_lines_of_code() {
+            if [[ ${#1} -lt 4 ]]; then
+              set_output "lines_of_code" "Lines of code" "$1"
+            elif [[ ${#1} -eq 4 ]]; then
+              set_output "lines_of_code" "Lines of code" "${1::1}.${1:1:1}" "k"
+            elif [[ ${#1} -eq 5 ]]; then
+              set_output "lines_of_code" "Lines of code" "${1:0:2}" "k"
+            elif [[ ${#1} -eq 6 ]]; then
+              set_output "lines_of_code" "Lines of code" "${1:0:3}" "k"
+            else
+              echo "::error::Got an unsupported value $1 for lines_of_code."
+              exit 1
+            fi
+          }
+          check_coverage() {
+            if [[ $1 -lt ${{ env.MIN_COVERAGE }} || $2 -lt ${{ env.MIN_COVERAGE }} ]]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "**ERROR: The code coverage is insufficient.**" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            fi
+          }
+          lines_of_code=$(cat ./TestCoverageReport/Summary.csv | grep -Po '(?<=Total lines:;)[0-9]+')
+          set_lines_of_code "$lines_of_code"
+          test_coverage=$(cat ./TestCoverageReport/Summary.csv | grep -Po '(?<=Line coverage:;)[0-9]+')
+          set_output "test_coverage" "Test coverage" "$test_coverage" "%"
+          mutation_report_path=$(find ./StrykerOutput -name mutation-report.md)
+          mutation_score=$(cat $mutation_report_path | grep -Po '(?<=## The final mutation score is )[0-9]+')
+          set_output "mutation_score" "Mutation score" "$mutation_score" "%"
+          check_coverage "$test_coverage" "$mutation_score"
+        working-directory: ${{ env.UNIT_TESTS_PATH }}
+
+      - name: Update lines of code gist
+        if: ${{ github.event_name == 'push' }}
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: ${{ env.GIST_ID }}
+          filename: lines-of-code.json
+          label: loc
+          message: ${{ steps.analyze-coverage-report.outputs.lines_of_code }}
+          color: blue
+
+      - name: Update test coverage gist
+        if: ${{ github.event_name == 'push' }}
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: ${{ env.GIST_ID }}
+          filename: test-coverage.json
+          label: test coverage
+          message: ${{ steps.analyze-coverage-report.outputs.test_coverage }}
+          color: brightgreen
+
+      - name: Update mutation score gist
+        if: ${{ github.event_name == 'push' }}
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: ${{ env.GIST_ID }}
+          filename: mutation-score.json
+          label: mutation score
+          message: ${{ steps.analyze-coverage-report.outputs.mutation_score }}
+          color: brightgreen
+
+      - name: Check src/ for changes
+        if: ${{ github.event_name == 'push' }}
+        id: changed-src
+        uses: marceloprado/has-changed-path@v1.0.1
+        with:
+          paths: ${{ env.SRC_PATH }}
+
+      - name: Create package
+        if: ${{ github.event_name == 'push' }}
+        run: dotnet publish --no-build --configuration Release --output ./app ${{ env.CSPROJ_PATH }}
+      
+      - name: Upload build artifact
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: app
+          path: ./app
+          retention-days: 1
+
+  deploy:
     name: Deploy
+    needs: build
+    if: ${{ needs.build.outputs.should-deploy == 'true' }}
     runs-on: ubuntu-latest
     environment:
       name: Production
       url: ${{ steps.deploy-to-azure.outputs.webapp-url }}
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-      - name: Restore dependencies
-        run: dotnet restore ${{ env.CSPROJ_PATH }}
-      - name: Build
-        run: dotnet build --no-restore --configuration Release ${{ env.CSPROJ_PATH }}
-      - name: Create package
-        run: dotnet publish --no-build --configuration Release --output ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} ${{ env.CSPROJ_PATH }}
-      - name: Deploy to Azure
+          name: app
+          path: ./app
+
+      - name: Deploy to Azure App Service
         id: deploy-to-azure
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          package: ./app
+

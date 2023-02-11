@@ -1,4 +1,0 @@
-stryker-config:
-  test-projects: [ 'Reddio.UnitTests/Reddio.UnitTests.csproj' ]
-  mutate: [ '!**/Reddio/Program.cs' ]
-  reporters: [ 'html', 'dots' ]

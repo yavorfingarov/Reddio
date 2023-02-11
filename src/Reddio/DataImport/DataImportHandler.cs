@@ -2,7 +2,7 @@
 {
     public interface IDataImportHandler
     {
-        Task HandleAsync();
+        Task HandleAsync(CancellationToken cancellationToken);
     }
 
     public class DataImportHandler : IDataImportHandler
@@ -27,7 +27,7 @@
             _Logger = logger;
         }
 
-        public async Task HandleAsync()
+        public async Task HandleAsync(CancellationToken cancellationToken)
         {
             var lastUpdate = _Db.QuerySingle<DateTime>("SELECT LastImport FROM Metadata");
             if (DateTime.UtcNow - lastUpdate < TimeSpan.FromHours(_DataImportConfiguration.Period) - TimeSpan.FromMinutes(5))
@@ -46,14 +46,14 @@
             {
                 if (station.TrackCount == 0)
                 {
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 500, "best", "all"));
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 300, "best", "year"));
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 200, "best", "month"));
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 100, "hot"));
+                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 500, "best", "all", cancellationToken));
+                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 300, "best", "year", cancellationToken));
+                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 200, "best", "month", cancellationToken));
+                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 100, "hot", null, cancellationToken));
                 }
                 else
                 {
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 50, "hot"));
+                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 50, "hot", null, cancellationToken));
                 }
             }
             ImportTracks(tracks);
@@ -61,9 +61,9 @@
         }
 
         private async Task<IEnumerable<Track>> GetTracksAsync(string stationName,
-            int stationId, int count, string sort, string? period = null)
+            int stationId, int count, string sort, string? period, CancellationToken cancellationToken)
         {
-            var commentThreads = await _RedditService.GetListingAsync(stationName, count, sort, period);
+            var commentThreads = await _RedditService.GetListingAsync(stationName, count, sort, period, cancellationToken);
             var tracks = commentThreads
                 .Select(t => new Track(stationId, t.Id, t.Title, t.Url))
                 .Reverse();

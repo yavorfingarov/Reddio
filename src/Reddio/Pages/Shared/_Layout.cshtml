@@ -8,19 +8,18 @@
     <meta name="author" content="Yavor Fingarov" />
     <meta name="theme-color" content="#a92e00">
     <title>@(ViewData["Station"] != null ? $"{ViewData["Station"]} @ reddio" : "reddio")</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css" />
     <link rel="stylesheet" href="~/styles.css" />
     <link rel="manifest" href="~/manifest.json" />
     <link rel="icon" type="image/png" href="~/icon32.png" />
 </head>
 <body>
     <header>
-        <span id="logo">
+        <div id="logo">
             <a asp-page="/Index">reddio</a>
-        </span>
+        </div>
         @if (ViewData["Station"] != null)
         {
-            <span id="station">@ViewData["Station"]</span>
+            <div id="station">@ViewData["Station"]</div>
         }
     </header>
     <noscript>
@@ -33,10 +32,13 @@
         document.getElementById("main-container").style.display = "inherit";
     </script>
     <footer>
-        <a asp-page="/About">About</a> /
-        <a asp-page="/Privacy">Privacy</a> /
-        <a asp-page="/License">License</a> /
-        <a href="https://github.com/yavorfingarov/Reddio">GitHub</a>
+        <div>
+            <a asp-page="/About">About</a> /
+            <a asp-page="/Privacy">Privacy</a> /
+            <a asp-page="/License">License</a> /
+            <a href="https://github.com/yavorfingarov/Reddio">GitHub</a>
+        </div>
+        <div id="build">Build: @Build.Number</div>
     </footer>
 </body>
 </html>

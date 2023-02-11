@@ -6,7 +6,8 @@ namespace Reddio.DataImport
 {
     public interface IRedditService
     {
-        Task<IEnumerable<CommentThreadData>> GetListingAsync(string subreddit, int threadCount, string sort, string? period = null);
+        Task<IEnumerable<CommentThreadData>> GetListingAsync(string subreddit,
+            int threadCount, string sort, string? period, CancellationToken cancellationToken);
     }
 
     public class RedditService : IRedditService
@@ -32,7 +33,7 @@ namespace Reddio.DataImport
         }
 
         public async Task<IEnumerable<CommentThreadData>> GetListingAsync(string subreddit,
-            int threadCount, string sort, string? period = null)
+            int threadCount, string sort, string? period, CancellationToken cancellationToken)
         {
             var listing = new List<CommentThreadData>();
             var batchSizes = Enumerable.Repeat(_RedditConfiguration.BatchSize, threadCount / _RedditConfiguration.BatchSize)
@@ -51,7 +52,7 @@ namespace Reddio.DataImport
                 {
                     url += $"&after={after}";
                 }
-                var listingResponse = await GetListingAsync(url);
+                var listingResponse = await GetListingAsync(url, cancellationToken);
                 listing.AddRange(listingResponse.Data.Children.Select(c => c.Data));
                 if (listingResponse.Data.After == null)
                 {
@@ -63,26 +64,26 @@ namespace Reddio.DataImport
             return listing;
         }
 
-        private async Task<ListingResponse> GetListingAsync(string url)
+        private async Task<ListingResponse> GetListingAsync(string url, CancellationToken cancellationToken)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             var authorizationHeader = await _MemoryCache.GetOrCreateAsync("OAuthToken", async entry =>
             {
-                var token = await GetTokenAsync();
+                var token = await GetTokenAsync(cancellationToken);
                 entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddSeconds(token.ExpiresIn - 5);
 
                 return $"{token.TokenType} {token.AccessToken}";
             });
             request.Headers.Add("authorization", authorizationHeader);
-            var response = await _HttpClient.SendAsync(request);
+            var response = await _HttpClient.SendAsync(request, cancellationToken);
             response.EnsureSuccessStatusCode();
             var rateLimitRemaining = (int)double.Parse(response.Headers.GetValues("x-ratelimit-remaining").Single(), CultureInfo.InvariantCulture);
             if (rateLimitRemaining == 0)
             {
                 var rateLimitReset = (int)double.Parse(response.Headers.GetValues("x-ratelimit-reset").Single(), CultureInfo.InvariantCulture);
-                await Task.Delay((rateLimitReset * 1000) + 2000);
+                await Task.Delay((rateLimitReset * 1000) + 2000, cancellationToken);
             }
-            var listingResponse = await response.Content.ReadFromJsonAsync<ListingResponse>(_JsonSerializerOptions);
+            var listingResponse = await response.Content.ReadFromJsonAsync<ListingResponse>(_JsonSerializerOptions, cancellationToken);
             if (listingResponse?.Data?.Children == null || !listingResponse.Data.Children.Any())
             {
                 throw new InvalidOperationException("Failed to get listing response.");
@@ -91,7 +92,7 @@ namespace Reddio.DataImport
             return listingResponse;
         }
 
-        private async Task<TokenResponse> GetTokenAsync()
+        private async Task<TokenResponse> GetTokenAsync(CancellationToken cancellationToken)
         {
             var url = $"https://www.reddit.com/api/v1/access_token?grant_type=password" +
                 $"&username={_RedditConfiguration.Username}&password={_RedditConfiguration.Password}";
@@ -99,9 +100,9 @@ namespace Reddio.DataImport
             var basicToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(
                 $"{_RedditConfiguration.ClientId}:{_RedditConfiguration.ClientSecret}"));
             request.Headers.Add("authorization", $"basic {basicToken}");
-            var response = await _HttpClient.SendAsync(request);
+            var response = await _HttpClient.SendAsync(request, cancellationToken);
             response.EnsureSuccessStatusCode();
-            var token = await response.Content.ReadFromJsonAsync<TokenResponse>(_JsonSerializerOptions);
+            var token = await response.Content.ReadFromJsonAsync<TokenResponse>(_JsonSerializerOptions, cancellationToken);
             if (token == null || string.IsNullOrWhiteSpace(token.TokenType) ||
                 string.IsNullOrWhiteSpace(token.AccessToken) || token.ExpiresIn <= 0)
             {

@@ -24,7 +24,7 @@ namespace Reddio.UnitTests.DataImport
         {
             Db.Execute("UPDATE Metadata SET LastImport = @LastImport", new { LastImport = DateTime.UtcNow.AddHours(-1) });
 
-            await _DataImportHandler.HandleAsync();
+            await _DataImportHandler.HandleAsync(CancellationToken.None);
         }
 
         [Fact]
@@ -41,19 +41,19 @@ namespace Reddio.UnitTests.DataImport
                 new { Name = "TestStation3", DisplayOrder = 30 });
             Db.Execute("INSERT INTO Track (StationId, ThreadId, Title, Url) VALUES (@StationId, @ThreadId, @Title, @Url)",
                 new { StationId = 1, ThreadId = "thread1", Title = "Thread Title 1", Url = "https://known.domain/thread1" });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation1", 50, "hot", null))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation1", 50, "hot", null, CancellationToken.None))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread1", "Thread Title 1", "https://known.domain/thread1"),
                     new CommentThreadData("thread2", "Thread Title 2", "https://known.domain/thread2"),
                 });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread3", "Thread Title 3", "https://reddio.test/thread3"),
                     new CommentThreadData("thread4", "Thread Title 4", "https://reddio.test/thread4"),
                 });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation3", It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation3", It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread5", "Thread Title 5", "https://reddio.test/thread5"),
@@ -61,7 +61,7 @@ namespace Reddio.UnitTests.DataImport
                 });
             LoggerMock.Setup(LogLevel.Debug);
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(_DataImportHandler.HandleAsync);
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _DataImportHandler.HandleAsync(CancellationToken.None));
             Assert.StartsWith("No tracks found for", exception.Message);
             Assert.DoesNotContain("TestStation1", exception.Message);
             Assert.Contains("TestStation2", exception.Message);
@@ -84,31 +84,31 @@ namespace Reddio.UnitTests.DataImport
                 new { Name = "TestStation2", DisplayOrder = 20 });
             Db.Execute("INSERT INTO Track (StationId, ThreadId, Title, Url) VALUES (@StationId, @ThreadId, @Title, @Url)",
                 new { StationId = 1, ThreadId = "thread1", Title = "Thread Title 1", Url = "https://known.domain/thread1" });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation1", 50, "hot", null))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation1", 50, "hot", null, CancellationToken.None))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread1", "Thread Title 1", "https://known.domain/thread1"),
                     new CommentThreadData("thread2", "Thread Title 2", "https://known.domain/thread2"),
                 });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 500, "best", "all"))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 500, "best", "all", CancellationToken.None))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread3", "Thread Title 3", "https://known.domain/thread3"),
                     new CommentThreadData("thread4", "Thread Title 4", "https://known.domain/thread4"),
                 });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 300, "best", "year"))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 300, "best", "year", CancellationToken.None))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread5", "Thread Title 5", "http://known.domain/thread5")
                 });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 200, "best", "month"))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 200, "best", "month", CancellationToken.None))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread6", "Thread Title 6", "https://known.domain/thread6"),
                     new CommentThreadData("thread8", "Thread Title 8", "https://reddio.test/thread8"),
                     new CommentThreadData("thread9", "Thread Title 9", "http://known.domain/thread9"),
                 });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 100, "hot", null))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 100, "hot", null, CancellationToken.None))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread3", "Thread Title 3", "https://known.domain/thread3"),
@@ -116,7 +116,7 @@ namespace Reddio.UnitTests.DataImport
                 });
             LoggerMock.Setup(LogLevel.Debug);
 
-            await _DataImportHandler.HandleAsync();
+            await _DataImportHandler.HandleAsync(CancellationToken.None);
 
             var lastImport = Db.QuerySingle<DateTime>("SELECT LastImport FROM Metadata");
             Assert.True(DateTime.UtcNow - lastImport < TimeSpan.FromSeconds(10));
