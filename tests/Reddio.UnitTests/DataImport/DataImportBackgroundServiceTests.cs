@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Reddio.DataImport;
 
@@ -12,7 +13,7 @@ namespace Reddio.UnitTests.DataImport
 
         private readonly Mock<IServiceScope> _ServiceScopeMock;
 
-        private readonly CancellationTokenSource _CancellationTokenSource = new(TimeSpan.FromMilliseconds(250));
+        private readonly Stopwatch _Stopwatch = new();
 
         public DataImportBackgroundServiceTests()
         {
@@ -38,10 +39,14 @@ namespace Reddio.UnitTests.DataImport
             var exception = new Exception("test");
             _DataImportHandlerMock.Setup(h => h.HandleAsync(It.IsAny<CancellationToken>()))
                 .Throws(exception);
+            var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
 
-            await _DataImportBackgroundService.StartAsync(_CancellationTokenSource.Token);
+            _Stopwatch.Start();
+            await _DataImportBackgroundService.StartAsync(cancellationTokenSource.Token);
             await _DataImportBackgroundService.ExecuteTask!;
+            _Stopwatch.Stop();
 
+            Assert.InRange(_Stopwatch.ElapsedMilliseconds, 240, 300);
             _DataImportHandlerMock.Verify(h => h.HandleAsync(It.IsAny<CancellationToken>()), Times.Once);
             LoggerMock.Verify(LogLevel.Error, "Could not import data.", exception);
             LoggerMock.VerifyNoOtherCalls();
@@ -53,10 +58,14 @@ namespace Reddio.UnitTests.DataImport
         {
             _DataImportHandlerMock.Setup(h => h.HandleAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
+            var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
 
-            await _DataImportBackgroundService.StartAsync(_CancellationTokenSource.Token);
+            _Stopwatch.Start();
+            await _DataImportBackgroundService.StartAsync(cancellationTokenSource.Token);
             await _DataImportBackgroundService.ExecuteTask!;
+            _Stopwatch.Stop();
 
+            Assert.InRange(_Stopwatch.ElapsedMilliseconds, 240, 300);
             _DataImportHandlerMock.Verify(h => h.HandleAsync(It.IsAny<CancellationToken>()), Times.Once);
             _ServiceScopeMock.Verify(s => s.Dispose(), Times.Once);
         }

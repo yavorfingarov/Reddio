@@ -27,6 +27,9 @@ jobs:
       should-deploy: ${{ steps.changed-src.outputs.changed }}
     steps:
 
+      - name: Get timestamp
+        run: echo "TIMESTAMP=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
       - name: Check out repository
         uses: actions/checkout@v3
         with:
@@ -44,7 +47,7 @@ jobs:
         run: dotnet format --no-restore --verify-no-changes --severity info
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build --no-restore --configuration Release --version-suffix ${{ env.TIMESTAMP }}
 
       - name: Run unit tests
         run: >
@@ -58,7 +61,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
-          name: TestResults
+          name: TestResults-${{ env.TIMESTAMP }}
           path: |
             '**/TestResults'
             '**/*.received.*'
@@ -82,7 +85,7 @@ jobs:
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
         with:
-          name: CoverageReport
+          name: CoverageReport-${{ env.TIMESTAMP }}
           path: |
             ${{ env.UNIT_TESTS_PATH }}/TestCoverageReport/
             ${{ env.UNIT_TESTS_PATH }}/StrykerOutput/
