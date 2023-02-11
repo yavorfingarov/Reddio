@@ -68,7 +68,7 @@ jobs:
         with:
           reports: '${{ env.UNIT_TESTS_PATH }}/coverage/**/coverage.cobertura.xml'
           targetdir: '${{ env.UNIT_TESTS_PATH }}/TestCoverageReport'
-          filefilters: '-Program.cs;-*.cshtml'
+          filefilters: '-**/Program.cs;-*.cshtml'
           reporttypes: 'Html;CsvSummary'
 
       - name: Set up Stryker
