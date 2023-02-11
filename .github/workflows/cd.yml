@@ -68,6 +68,7 @@ jobs:
         with:
           reports: '${{ env.UNIT_TESTS_PATH }}/coverage/**/coverage.cobertura.xml'
           targetdir: '${{ env.UNIT_TESTS_PATH }}/TestCoverageReport'
+          filefilters: '-Program.cs;-*.cshtml'
           reporttypes: 'Html;CsvSummary'
 
       - name: Set up Stryker
@@ -187,7 +188,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: Production
-      url: ${{ steps.deploy-to-azure.outputs.webapp-url }}
+      url: ${{ steps.deploy-to-azure.outputs.webapp-url }}  
     steps:
 
       - name: Download build artifact
