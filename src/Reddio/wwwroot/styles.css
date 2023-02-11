@@ -44,6 +44,9 @@ table {
 }
 
 header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em 0.5em;
     font-size: 1.25em;
     font-weight: 600;
     padding-bottom: 1rem;
@@ -52,6 +55,10 @@ header {
 }
 
 footer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: flex-end;
     font-size: 0.8em;
     padding-top: 1rem;
     border-top: 2px solid var(--c-br);
@@ -131,10 +138,6 @@ code {
     font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
 }
 
-#station {
-    margin-left: 0.4em;
-}
-
 #main-container,
 #cookie-dialog,
 #player-container {
@@ -166,7 +169,7 @@ code {
 
 #build {
     font-size: 0.7em;
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 @media (max-width: 480px) {

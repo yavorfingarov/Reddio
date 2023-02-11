@@ -14,12 +14,12 @@
 </head>
 <body>
     <header>
-        <span id="logo">
+        <div id="logo">
             <a asp-page="/Index">reddio</a>
-        </span>
+        </div>
         @if (ViewData["Station"] != null)
         {
-            <span id="station">@ViewData["Station"]</span>
+            <div id="station">@ViewData["Station"]</div>
         }
     </header>
     <noscript>
@@ -32,13 +32,13 @@
         document.getElementById("main-container").style.display = "inherit";
     </script>
     <footer>
-        <p>
+        <div>
             <a asp-page="/About">About</a> /
             <a asp-page="/Privacy">Privacy</a> /
             <a asp-page="/License">License</a> /
             <a href="https://github.com/yavorfingarov/Reddio">GitHub</a>
-        </p>
-        <p id="build">Build: @Build.Number</p>
+        </div>
+        <div id="build">Build: @Build.Number</div>
     </footer>
 </body>
 </html>

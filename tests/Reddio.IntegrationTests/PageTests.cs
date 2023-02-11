@@ -196,13 +196,13 @@ namespace Reddio.IntegrationTests
             Assert.Equal(new[] { "header", "noscript", "main", "script", "footer" },
                 htmlRoot.SelectNodes("/html/body/*").Select(n => n.Name));
 
-            Assert.Equal("reddio", htmlRoot.SelectSingleNode("/html/body/header/span").InnerText.Trim());
+            Assert.Equal("reddio", htmlRoot.SelectSingleNode("/html/body/header/div").InnerText.Trim());
 
             Assert.Equal(2, htmlRoot.SelectNodes("/html/body/footer/*").Count);
-            AssertLinks(htmlRoot.SelectNodes("/html/body/footer/p[1]/*"),
+            AssertLinks(htmlRoot.SelectNodes("/html/body/footer/div[1]/*"),
                 ("/About", "About"), ("/Privacy", "Privacy"), ("/License", "License"),
                 ("https://github.com/yavorfingarov/Reddio", "GitHub"));
-            Assert.Contains("Build:", htmlRoot.SelectNodes("/html/body/footer/p[2]").Single().InnerText);
+            Assert.Contains("Build:", htmlRoot.SelectNodes("/html/body/footer/div[2]").Single().InnerText);
         }
 
         private static void AssertLinks(HtmlNodeCollection nodes, params (string Route, string Text)[] links)

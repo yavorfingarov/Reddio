@@ -28,7 +28,7 @@ jobs:
     steps:
 
       - name: Get timestamp
-        run: echo "TIMESTAMP=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+        run: echo "TIMESTAMP=$(date +'%Y%m%d%H%M')" >> $GITHUB_ENV
 
       - name: Check out repository
         uses: actions/checkout@v3
