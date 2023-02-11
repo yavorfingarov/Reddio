@@ -72,7 +72,7 @@ jobs:
           reporttypes: 'Html;CsvSummary'
 
       - name: Set up Stryker
-        run: dotnet tool install dotnet-stryker --version 3.4.0 --tool-path ./tools
+        run: dotnet tool install dotnet-stryker --tool-path ./tools
         working-directory: ${{ env.UNIT_TESTS_PATH }}
 
       - name: Run mutation tests
@@ -188,7 +188,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: Production
-      url: ${{ steps.deploy-to-azure.outputs.webapp-url }}  
+      url: ${{ steps.deploy-to-azure.outputs.webapp-url }}
     steps:
 
       - name: Download build artifact
