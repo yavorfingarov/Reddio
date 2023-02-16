@@ -7,8 +7,7 @@ on:
     branches: [ master ]
 
 env:
-  DOTNET_VERSION: 7.0.x
-  SRC_PATH: ./src
+  DOTNET_VERSION: 7.0.102
   CSPROJ_PATH: ./src/Reddio/Reddio.csproj
   UNIT_TESTS_PATH: ./tests/Reddio.UnitTests
   MIN_COVERAGE: 90
@@ -170,14 +169,14 @@ jobs:
         id: changed-src
         uses: marceloprado/has-changed-path@v1.0.1
         with:
-          paths: ${{ env.SRC_PATH }}
+          paths: ./src
 
       - name: Create package
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && steps.changed-src.outputs.changed == 'true' }}
         run: dotnet publish --no-build --configuration Release --output ./app ${{ env.CSPROJ_PATH }}
       
       - name: Upload build artifact
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && steps.changed-src.outputs.changed == 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: app
@@ -208,3 +207,8 @@ jobs:
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ./app
 
+      - name: Delete build artifact
+        if: ${{ always() }}
+        uses: geekyeggo/delete-artifact@v2
+        with:
+            name: app
