@@ -123,7 +123,7 @@ namespace Reddio.DataImport
             sb.AppendLine("Headers:");
             foreach (var header in response.Headers)
             {
-                sb.AppendLine(CultureInfo.InvariantCulture, $"{header.Key}: {header.Value}");
+                sb.AppendLine(CultureInfo.InvariantCulture, $"{header.Key}={header.Value}");
             }
             sb.AppendLine("Body:");
             sb.AppendLine(await response.Content.ReadAsStringAsync());
