@@ -46,15 +46,11 @@
             {
                 if (station.TrackCount == 0)
                 {
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 500, "best", "all", cancellationToken));
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 300, "best", "year", cancellationToken));
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 200, "best", "month", cancellationToken));
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 100, "hot", null, cancellationToken));
+                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 300, "best", "all", cancellationToken));
+                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 200, "best", "year", cancellationToken));
+                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 100, "best", "month", cancellationToken));
                 }
-                else
-                {
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 50, "hot", null, cancellationToken));
-                }
+                tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 50, "hot", null, cancellationToken));
             }
             ImportTracks(tracks);
             _DataImportWatcher.IsPerformingFreshImport = false;

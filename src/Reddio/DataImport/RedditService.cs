@@ -76,7 +76,7 @@ namespace Reddio.DataImport
             });
             request.Headers.Add("authorization", authorizationHeader);
             var response = await _HttpClient.SendAsync(request, cancellationToken);
-            response.EnsureSuccessStatusCode();
+            await EnsureSuccessStatusCode(response);
             var rateLimitRemaining = (int)double.Parse(response.Headers.GetValues("x-ratelimit-remaining").Single(), CultureInfo.InvariantCulture);
             if (rateLimitRemaining == 0)
             {
@@ -101,7 +101,7 @@ namespace Reddio.DataImport
                 $"{_RedditConfiguration.ClientId}:{_RedditConfiguration.ClientSecret}"));
             request.Headers.Add("authorization", $"basic {basicToken}");
             var response = await _HttpClient.SendAsync(request, cancellationToken);
-            response.EnsureSuccessStatusCode();
+            await EnsureSuccessStatusCode(response);
             var token = await response.Content.ReadFromJsonAsync<TokenResponse>(_JsonSerializerOptions, cancellationToken);
             if (token == null || string.IsNullOrWhiteSpace(token.TokenType) ||
                 string.IsNullOrWhiteSpace(token.AccessToken) || token.ExpiresIn <= 0)
@@ -110,6 +110,25 @@ namespace Reddio.DataImport
             }
 
             return token;
+        }
+
+        private static async Task EnsureSuccessStatusCode(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+            var sb = new StringBuilder("Received an unexpected response.");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"StatusCode: {response.StatusCode}");
+            sb.AppendLine("Headers:");
+            foreach (var header in response.Headers)
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture, $"{header.Key}: {header.Value}");
+            }
+            sb.AppendLine("Body:");
+            sb.AppendLine(await response.Content.ReadAsStringAsync());
+
+            throw new HttpRequestException(sb.ToString());
         }
     }
 

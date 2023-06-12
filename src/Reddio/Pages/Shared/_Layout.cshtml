@@ -22,15 +22,15 @@
             <div id="station">@ViewData["Station"]</div>
         }
     </header>
-    <noscript>
-        You need to enable JavaScript to use this app.
-    </noscript>
     <main id="main-container">
         @RenderBody()
     </main>
     <script>
         document.getElementById("main-container").style.display = "inherit";
     </script>
+    <noscript>
+        You need to enable JavaScript to use this app.
+    </noscript>
     <footer>
         <div>
             <a asp-page="/About">About</a> /
