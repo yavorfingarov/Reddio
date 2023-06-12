@@ -90,25 +90,25 @@ namespace Reddio.UnitTests.DataImport
                     new CommentThreadData("thread1", "Thread Title 1", "https://known.domain/thread1"),
                     new CommentThreadData("thread2", "Thread Title 2", "https://known.domain/thread2"),
                 });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 500, "best", "all", CancellationToken.None))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 300, "best", "all", CancellationToken.None))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread3", "Thread Title 3", "https://known.domain/thread3"),
                     new CommentThreadData("thread4", "Thread Title 4", "https://known.domain/thread4"),
                 });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 300, "best", "year", CancellationToken.None))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 200, "best", "year", CancellationToken.None))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread5", "Thread Title 5", "http://known.domain/thread5")
                 });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 200, "best", "month", CancellationToken.None))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 100, "best", "month", CancellationToken.None))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread6", "Thread Title 6", "https://known.domain/thread6"),
                     new CommentThreadData("thread8", "Thread Title 8", "https://reddio.test/thread8"),
                     new CommentThreadData("thread9", "Thread Title 9", "http://known.domain/thread9"),
                 });
-            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 100, "hot", null, CancellationToken.None))
+            _RedditServiceMock.Setup(r => r.GetListingAsync("TestStation2", 50, "hot", null, CancellationToken.None))
                 .ReturnsAsync(new[]
                 {
                     new CommentThreadData("thread3", "Thread Title 3", "https://known.domain/thread3"),
