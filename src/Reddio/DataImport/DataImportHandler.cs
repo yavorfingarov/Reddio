@@ -44,6 +44,7 @@
             var tracks = new List<Track>();
             foreach (var station in stations)
             {
+                _Logger.LogDebug("Fetching listing for {Station}.", station);
                 if (station.TrackCount == 0)
                 {
                     tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 300, "best", "all", cancellationToken));
