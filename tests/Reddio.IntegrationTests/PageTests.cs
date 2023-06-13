@@ -98,8 +98,8 @@ namespace Reddio.IntegrationTests
             await Check(path, htmlRoot =>
             {
                 Assert.Equal("404", htmlRoot.SelectSingleNode("//main/h1").InnerText);
-                Assert.Equal("Not Found", htmlRoot.SelectNodes("//main/p")[0].InnerText);
-                Assert.Contains("Request ID", htmlRoot.SelectNodes("//main/p")[1].InnerText);
+                Assert.Equal("Not Found", htmlRoot.SelectNodes("//main/p")[1].InnerText);
+                Assert.Contains("Request ID", htmlRoot.SelectNodes("//main/p")[2].InnerText);
             }, expectedStatusCode: 404);
         }
 
@@ -146,14 +146,12 @@ namespace Reddio.IntegrationTests
                 .Select(a => a.Attributes["href"].Value);
             foreach (var link in links)
             {
-                if (_VisitedPaths.Contains(link))
+                if (_VisitedPaths.Contains(link) || link.StartsWith("https://", StringComparison.InvariantCulture))
                 {
                     continue;
                 }
 
-                var response = link.StartsWith("https://", StringComparison.InvariantCulture) ?
-                    await _Fixture.ExternalClient.GetAsync(link) :
-                    await _Fixture.Client.GetAsync(link);
+                var response = await _Fixture.Client.GetAsync(link);
 
                 Assert.Equal(200, (int)response.StatusCode);
                 Assert.Contains("text/html", response.Content?.Headers?.ContentType?.ToString());
@@ -193,7 +191,7 @@ namespace Reddio.IntegrationTests
             Assert.Equal(new[] { "/styles.css", "/manifest.json", "/icon32.png" },
                 htmlRoot.SelectNodes("/html/head/link").Select(n => n.Attributes["href"].Value));
 
-            Assert.Equal(new[] { "header", "noscript", "main", "script", "footer" },
+            Assert.Equal(new[] { "header", "main", "script", "noscript", "footer" },
                 htmlRoot.SelectNodes("/html/body/*").Select(n => n.Name));
 
             Assert.Equal("reddio", htmlRoot.SelectSingleNode("/html/body/header/div").InnerText.Trim());

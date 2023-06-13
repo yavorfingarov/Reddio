@@ -45,7 +45,7 @@ namespace Reddio.IntegrationTests
         [Fact]
         public async Task Post_Queue_ReturnsQueue_WhenIgnoreThreadIdsIsEmpty()
         {
-            var response = await _Fixture.Client.PostAsJsonAsync("/api/queue", new QueueRequest("Jazz", Enumerable.Empty<string>()));
+            var response = await _Fixture.Client.PostAsJsonAsync("/api/queue", new QueueRequest("ElitistClassical", Enumerable.Empty<string>()));
             var tracks = await response.Content.ReadFromJsonAsync<IEnumerable<Track>>();
 
             Assert.NotNull(tracks);
@@ -58,7 +58,7 @@ namespace Reddio.IntegrationTests
         [Fact]
         public async Task Post_Queue_ReturnsQueue_WhenIgnoreThreadIdsIsNotEmpty()
         {
-            var response1 = await _Fixture.Client.PostAsJsonAsync("/api/queue", new QueueRequest("Jazz", Enumerable.Empty<string>()));
+            var response1 = await _Fixture.Client.PostAsJsonAsync("/api/queue", new QueueRequest("ElitistClassical", Enumerable.Empty<string>()));
 
             Assert.Equal(200, (int)response1.StatusCode);
 
@@ -68,7 +68,7 @@ namespace Reddio.IntegrationTests
             Assert.True(threadIds1?.Any());
 
             var ignoreThreadIds = threadIds1?.Take(5);
-            var response2 = await _Fixture.Client.PostAsJsonAsync("/api/queue", new QueueRequest("Jazz", ignoreThreadIds!));
+            var response2 = await _Fixture.Client.PostAsJsonAsync("/api/queue", new QueueRequest("ElitistClassical", ignoreThreadIds!));
 
             Assert.Equal(200, (int)response1.StatusCode);
 
@@ -90,7 +90,7 @@ namespace Reddio.IntegrationTests
             while (!ignoreThreadIds.IsProperSupersetOf(queueThreadIds!))
             {
                 queueThreadIds!.ToList().ForEach(t => ignoreThreadIds.Add(t));
-                var response = await _Fixture.Client.PostAsJsonAsync("/api/queue", new QueueRequest("Jazz", ignoreThreadIds));
+                var response = await _Fixture.Client.PostAsJsonAsync("/api/queue", new QueueRequest("ElitistClassical", ignoreThreadIds));
                 var tracks = await response.Content.ReadFromJsonAsync<IEnumerable<Track>>();
                 queueThreadIds = tracks?.Select(t => t.ThreadId);
                 requestCount++;
