@@ -44,16 +44,19 @@
             var tracks = new List<Track>();
             foreach (var station in stations)
             {
-                if (station.TrackCount == 0)
+                try
                 {
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 500, "best", "all", cancellationToken));
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 300, "best", "year", cancellationToken));
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 200, "best", "month", cancellationToken));
-                    tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 100, "hot", null, cancellationToken));
-                }
-                else
-                {
+                    if (station.TrackCount == 0)
+                    {
+                        tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 300, "best", "all", cancellationToken));
+                        tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 200, "best", "year", cancellationToken));
+                        tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 100, "best", "month", cancellationToken));
+                    }
                     tracks.AddRange(await GetTracksAsync(station.Name, station.Id, 50, "hot", null, cancellationToken));
+                }
+                catch (HttpRequestException)
+                {
+                    _Logger.LogDebug("Error fetching {Station}.", station.Name);
                 }
             }
             ImportTracks(tracks);
@@ -81,7 +84,6 @@
             try
             {
                 var affectedRows = InsertData(transaction, tracks, knownDomains);
-                ValidateImport(transaction);
                 _Db.Execute("UPDATE Metadata SET LastImport = @LastImport",
                     new { LastImport = DateTime.UtcNow }, transaction);
                 transaction.Commit();
@@ -110,21 +112,6 @@
             }
 
             return affectedRows;
-        }
-
-        private void ValidateImport(IDbTransaction transaction)
-        {
-            var emptyStationNames = _Db.Query<string>(
-                "SELECT s.Name " +
-                "FROM Station s " +
-                "LEFT JOIN Track t ON t.StationId = s.Id " +
-                "GROUP BY s.Id " +
-                "HAVING COUNT(t.Id) = 0",
-                transaction: transaction);
-            if (emptyStationNames.Any())
-            {
-                throw new InvalidOperationException($"No tracks found for {string.Join(", ", emptyStationNames)}.");
-            }
         }
     }
 
