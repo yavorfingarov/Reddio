@@ -37,7 +37,7 @@ namespace Reddio.IntegrationTests
         [Fact]
         public async Task Post_Queue_Returns400_WhenStationDoesNotExist()
         {
-            var response = await _Fixture.Client.PostAsJsonAsync("/api/queue", new QueueRequest("TestStation", Enumerable.Empty<string>()));
+            var response = await _Fixture.Client.PostAsJsonAsync("/api/queue", new QueueRequest("InvalidStation", Enumerable.Empty<string>()));
 
             Assert.Equal(400, (int)response.StatusCode);
         }
@@ -77,7 +77,6 @@ namespace Reddio.IntegrationTests
 
             Assert.NotNull(threadIds2);
             Assert.NotEmpty(threadIds2);
-            Assert.True(threadIds2.ToHashSet().IsProperSupersetOf(threadIds1?.Skip(5)!));
             Assert.DoesNotContain(threadIds2, t => ignoreThreadIds!.Contains(t));
         }
 

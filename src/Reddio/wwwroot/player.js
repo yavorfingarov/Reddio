@@ -45,7 +45,6 @@ function loadTrack(track, playing) {
         }
     });
     document.getElementById("track-title").innerText = track.title;
-    document.getElementById("view-thread").href = createRedditLink(station, track.threadId);
 }
 
 async function onStart() {

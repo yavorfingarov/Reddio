@@ -2,7 +2,6 @@ using DbUp;
 using Microsoft.Data.Sqlite;
 using NLog;
 using NLog.Web;
-using Reddio.DataImport;
 using SimpleRequestLogger;
 
 namespace Reddio
@@ -46,14 +45,6 @@ namespace Reddio
 
             builder.Services.AddScoped<IDbConnection>(sp => new SqliteConnection(builder.Configuration.GetConnectionString("Default")));
 
-            builder.Services.AddScoped<IDataImportHandler, DataImportHandler>();
-
-            builder.Services.AddSingleton<DataImportWatcher>();
-
-            builder.Services.AddHostedService<DataImportBackgroundService>();
-
-            builder.Services.AddHttpClient<IRedditService, RedditService>();
-
             builder.Services.AddRazorPages(options =>
             {
                 options.Conventions.AddPageRoute("/Listen", "/r/{station}");
@@ -80,8 +71,6 @@ namespace Reddio
 
                 apiBranch.UseHttpsRedirection();
 
-                apiBranch.UseMiddleware<DataImportWatcher>();
-
                 apiBranch.UseRouting();
 
                 apiBranch.UseEndpoints(endpoints => endpoints.MapEndpoints());
@@ -99,8 +88,6 @@ namespace Reddio
             app.UseStaticFiles();
 
             app.UseStatusCodePagesWithReExecute("/Error");
-
-            app.UseMiddleware<DataImportWatcher>();
 
             app.MapRazorPages();
         }

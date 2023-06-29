@@ -1,9 +1,5 @@
 "use strict";
 
-function createRedditLink(station, threadId) {
-    return "https://www.reddit.com/r/" + station + "/comments/" + threadId;
-}
-
 const storage = new Proxy({}, {
     get(_, key) {
         return JSON.parse(localStorage.getItem(key));
