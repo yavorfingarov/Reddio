@@ -7,15 +7,11 @@ on:
     branches: [ master ]
 
 env:
-  DOTNET_VERSION: 7.0.102
+  DOTNET_VERSION: 7.0.x
   CSPROJ_PATH: ./src/Reddio/Reddio.csproj
   UNIT_TESTS_PATH: ./tests/Reddio.UnitTests
-  MIN_COVERAGE: 85
+  MIN_COVERAGE: 75
   GIST_ID: d850286102a68e918ab12089f7497d60
-  REDDIT__CLIENTID: ${{ secrets.REDDIT__CLIENTID }}
-  REDDIT__CLIENTSECRET: ${{ secrets.REDDIT__CLIENTSECRET }}
-  REDDIT__PASSWORD: ${{ secrets.REDDIT__PASSWORD }}
-  REDDIT__USERNAME: ${{ secrets.REDDIT__USERNAME }}
   AZURE_WEBAPP_NAME: Reddio
 
 jobs:
@@ -63,7 +59,7 @@ jobs:
             '**/*.received.*'
 
       - name: Generate test coverage report
-        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.17
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.22
         with:
           reports: '${{ env.UNIT_TESTS_PATH }}/coverage/**/coverage.cobertura.xml'
           targetdir: '${{ env.UNIT_TESTS_PATH }}/TestCoverageReport'

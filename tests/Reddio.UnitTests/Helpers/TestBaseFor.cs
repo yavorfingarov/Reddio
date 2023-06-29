@@ -3,15 +3,12 @@ using DbUp;
 using DbUp.SQLite.Helpers;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
-using Reddio.DataImport;
 
 namespace Reddio.UnitTests.Helpers
 {
     public abstract class TestBaseFor<T> : IDisposable
     {
         public Mock<ILogger<T>> LoggerMock { get; }
-
-        public DataImportConfiguration DataImportConfiguration { get; }
 
         public IDbConnection Db { get; }
 
@@ -32,11 +29,6 @@ namespace Reddio.UnitTests.Helpers
             Db.Execute("DELETE FROM Station");
             Db.Execute("DELETE FROM KnownDomain");
             Db.Execute("DELETE FROM sqlite_sequence");
-            DataImportConfiguration = new DataImportConfiguration()
-            {
-                Period = 6,
-                HostedServicePeriod = 1
-            };
         }
 
         public void Dispose()

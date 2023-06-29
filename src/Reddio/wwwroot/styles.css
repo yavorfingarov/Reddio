@@ -39,7 +39,8 @@ body {
 
 p,
 ul,
-table {
+table,
+details {
     margin-bottom: 1em;
 }
 

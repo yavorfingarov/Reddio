@@ -19,12 +19,7 @@ function createHistoryRow(track) {
         addLeadingZero(playedDate.getMinutes());
     row.append(timestamp);
     let entry = document.createElement("div");
-    let text = document.createTextNode("[" + track.station + "] ");
-    entry.append(text);
-    let link = document.createElement("a");
-    link.href = createRedditLink(track.station, track.threadId);
-    link.innerText = track.title;
-    entry.append(link);
+    entry.innerText = "[" + track.station + "] " + track.title;
     row.append(entry);
     return row;
 }

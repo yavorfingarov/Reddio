@@ -26,7 +26,7 @@
                 "FROM Track t " +
                 "JOIN Station s ON s.Id = t.StationId " +
                 "WHERE {0} " +
-                "ORDER BY t.Id DESC " +
+                "ORDER BY RANDOM() " +
                 "LIMIT @QueueLength";
             var predicates = new List<string>() { "s.Name = @StationName" };
             var parameters = new Dictionary<string, object?>()

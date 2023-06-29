@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Dapper;
+using DbUp;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.Sqlite;
 
 namespace Reddio.IntegrationTests
 {
-    public class AppFixture
+    public sealed class AppFixture
     {
         public HttpClient Client { get; }
 
@@ -10,20 +13,35 @@ namespace Reddio.IntegrationTests
 
         public AppFixture()
         {
+            SeedData();
             var factory = new WebApplicationFactory<Program>();
             Client = factory.CreateClient();
             ExternalClient = new HttpClient();
-            var retries = 0;
-            while (retries < 10 * 60)
+        }
+
+        private static void SeedData()
+        {
+            Directory.CreateDirectory("bin/Debug/data");
+            var connectionString = "DataSource=bin/Debug/data/Reddio.db;Mode=ReadWriteCreate;Cache=Shared";
+            var upgrader = DeployChanges.To
+                .SQLiteDatabase(connectionString)
+                .WithScriptsEmbeddedInAssembly(typeof(Program).Assembly)
+                .LogToNowhere()
+                .Build();
+            var result = upgrader.PerformUpgrade();
+            if (!result.Successful)
             {
-                Thread.Sleep(1000);
-                var request = new HttpRequestMessage(HttpMethod.Head, "/api/health");
-                var response = Client.SendAsync(request).Result;
-                if ((int)response.StatusCode == 200)
-                {
-                    break;
-                }
-                retries++;
+                throw result.Error;
+            }
+            var db = new SqliteConnection(connectionString);
+            if (db.QueryFirstOrDefault<int?>("SELECT Id FROM Track") != null)
+            {
+                return;
+            }
+            for (var i = 0; i < 250; i++)
+            {
+                db.Execute("INSERT INTO Track (StationId, ThreadId, Title, Url) VALUES (@StationId, @ThreadId, @Title, @Url)",
+                    new { StationId = 1, ThreadId = $"thread{i}", Title = $"Title{i}", Url = $"https://reddio.test/track{i}" });
             }
         }
     }

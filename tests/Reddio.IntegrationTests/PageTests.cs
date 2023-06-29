@@ -98,8 +98,8 @@ namespace Reddio.IntegrationTests
             await Check(path, htmlRoot =>
             {
                 Assert.Equal("404", htmlRoot.SelectSingleNode("//main/h1").InnerText);
-                Assert.Equal("Not Found", htmlRoot.SelectNodes("//main/p")[1].InnerText);
-                Assert.Contains("Request ID", htmlRoot.SelectNodes("//main/p")[2].InnerText);
+                Assert.Equal("Not Found", htmlRoot.SelectNodes("//main/p")[0].InnerText);
+                Assert.Contains("Request ID", htmlRoot.SelectNodes("//main/p")[1].InnerText);
             }, expectedStatusCode: 404);
         }
 
