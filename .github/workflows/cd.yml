@@ -59,7 +59,7 @@ jobs:
             '**/*.received.*'
 
       - name: Generate test coverage report
-        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.22
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.24
         with:
           reports: '${{ env.UNIT_TESTS_PATH }}/coverage/**/coverage.cobertura.xml'
           targetdir: '${{ env.UNIT_TESTS_PATH }}/TestCoverageReport'
